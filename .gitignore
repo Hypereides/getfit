@@ -6,6 +6,7 @@ Thumbs.db
 *.swp
 .history/
 
+
 # --- Secrets / env ---
 .env
 .env.*
