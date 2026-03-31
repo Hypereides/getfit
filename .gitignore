@@ -86,3 +86,5 @@ docker-compose.override.yml
 *.apk
 *.aab
 *.ipa
+
+out.pdf

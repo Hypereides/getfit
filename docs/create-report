@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+
+args=(--pdf-engine=xelatex
+    --from markdown+hard_line_breaks
+    -V mainfont="DejaVu Serif"
+    -V geometry:margin=3cm
+)
+
+cd project-description/src/
+pandoc project-description.md -o out.pdf "${args[@]}"
+mv out.pdf ../exports/out.pdf
+cd ../../
+
+cd use-cases/src/
+pandoc use-cases.md -o out.pdf "${args[@]}"
+mv out.pdf ../exports/out.pdf
+cd ../../
+
+cd domain-model/src/
+pandoc domain-model.md -o out.pdf "${args[@]}"
+mv out.pdf ../exports/out.pdf
+cd ../../
+
+pdfunite \
+    project-description/exports/out.pdf \
+    use-cases/exports/out.pdf \
+    domain-model/exports/out.pdf \
+    report.pdf \
