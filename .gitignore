@@ -61,17 +61,6 @@ backend/.packages
 backend/.pub/
 backend/.pub-cache/
 
-# If backend is Node instead, uncomment:
-# backend/node_modules/
-# backend/dist/
-# backend/.next/
-
-# If backend is Python instead, uncomment:
-# backend/.venv/
-# backend/venv/
-# backend/__pycache__/
-# backend/.pytest_cache/
-
 # --- PostgreSQL / local database data ---
 database/data/
 database/data/*
