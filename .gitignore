@@ -6,7 +6,6 @@ Thumbs.db
 *.swp
 .history/
 
-
 # --- Secrets / env ---
 .env
 .env.*
@@ -30,26 +29,7 @@ Thumbs.db
 **/coverage/
 **/doc/api/
 
-# Flutter platform-generated / local files
-**/ios/Flutter/.last_build_id
-**/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/flutter_export_environment.sh
-**/ios/Flutter/app.flx
-**/ios/Flutter/app.zip
-**/ios/Flutter/flutter_assets/
-**/ios/Flutter/App.framework
-**/ios/Flutter/Flutter.framework
-**/ios/.symlinks/
-**/ios/Pods/
-**/ios/Runner/GeneratedPluginRegistrant.*
-**/android/.gradle/
-**/android/local.properties
-**/android/key.properties
-**/android/app/debug/
-**/android/app/profile/
-**/android/app/release/
-
-# IntelliJ / Android Studio leftovers
+# --- IntelliJ / Android Studio leftovers ---
 **/*.iml
 **/.idea/
 
@@ -72,8 +52,4 @@ pgdata/
 docker-compose.override.yml
 
 # --- Generated exports ---
-*.apk
-*.aab
-*.ipa
-
 out.pdf
