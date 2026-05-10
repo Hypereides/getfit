@@ -1,0 +1,59 @@
+[
+  {
+    "id": "coach_001",
+    "email": "coach1@getfit.com",
+    "password": "123456",
+    "role": "coach",
+    "premiumEnabled": false,
+    "selectedCoachId": null,
+    "profile": {
+      "name": "Coach Maria",
+      "age": 31,
+      "sex": "female",
+      "heightCm": 170,
+      "weightKg": 62,
+      "goal": "maintain",
+      "activityLevel": "active",
+      "bmi": 21.5,
+      "tdee": 2250
+    }
+  },
+  {
+    "id": "coach_002",
+    "email": "coach2@getfit.com",
+    "password": "123456",
+    "role": "coach",
+    "premiumEnabled": false,
+    "selectedCoachId": null,
+    "profile": {
+      "name": "Coach Nikos",
+      "age": 34,
+      "sex": "male",
+      "heightCm": 182,
+      "weightKg": 84,
+      "goal": "maintain",
+      "activityLevel": "very_active",
+      "bmi": 25.4,
+      "tdee": 2900
+    }
+  },
+  {
+    "id": "user_001",
+    "email": "user1@getfit.com",
+    "password": "123456",
+    "role": "user",
+    "premiumEnabled": true,
+    "selectedCoachId": "coach_001",
+    "profile": {
+      "name": "Anna",
+      "age": 22,
+      "sex": "female",
+      "heightCm": 168,
+      "weightKg": 64,
+      "goal": "lose_weight",
+      "activityLevel": "moderately_active",
+      "bmi": 22.7,
+      "tdee": 2050
+    }
+  }
+]
