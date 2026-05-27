@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../core/state/session_controller.dart';
+import '../../../core/widgets/app_dropdown_field.dart';
 import '../../home/presentation/home_shell.dart';
+import '../../auth/domain/fitness_profile.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -19,6 +24,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   String _sex = 'male';
   String _goal = 'lose_weight';
   String _activityLevel = 'moderately_active';
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -52,30 +58,97 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  InputDecoration _dropdownDecoration(String label, IconData icon) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(
-        color: Colors.grey[700],
-        fontWeight: FontWeight.w500,
-      ),
-      prefixIcon: Icon(icon, color: Colors.grey[600]),
-      filled: true,
-      fillColor: Colors.grey[50],
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      focusedBorder: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
-        borderSide: BorderSide(color: Color(0xFF2E7D32), width: 2),
-      ),
+  double _calculateBmi(double heightCm, double weightKg) {
+    final heightM = heightCm / 100;
+    if (heightM <= 0) return 0;
+    return weightKg / (heightM * heightM);
+  }
+
+  double _activityMultiplier(String activityLevel) {
+    switch (activityLevel) {
+      case 'sedentary':
+        return 1.2;
+      case 'lightly_active':
+        return 1.375;
+      case 'moderately_active':
+        return 1.55;
+      case 'active':
+        return 1.725;
+      case 'very_active':
+        return 1.9;
+      default:
+        return 1.55;
+    }
+  }
+
+  double _calculateTdee({
+    required String sex,
+    required int age,
+    required double heightCm,
+    required double weightKg,
+    required String activityLevel,
+  }) {
+    final bmr = sex == 'male'
+        ? 10 * weightKg + 6.25 * heightCm - 5 * age + 5
+        : 10 * weightKg + 6.25 * heightCm - 5 * age - 161;
+
+    return bmr * _activityMultiplier(activityLevel);
+  }
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final name = _nameController.text.trim();
+    final age = int.tryParse(_ageController.text.trim()) ?? 0;
+    final heightCm = double.tryParse(_heightController.text.trim()) ?? 0;
+    final weightKg = double.tryParse(_weightController.text.trim()) ?? 0;
+
+    final bmi = _calculateBmi(heightCm, weightKg);
+    final tdee = _calculateTdee(
+      sex: _sex,
+      age: age,
+      heightCm: heightCm,
+      weightKg: weightKg,
+      activityLevel: _activityLevel,
     );
+
+    final profile = FitnessProfile(
+      name: name.isEmpty ? 'User' : name,
+      age: age,
+      sex: _sex,
+      heightCm: heightCm,
+      weightKg: weightKg,
+      goal: _goal,
+      activityLevel: _activityLevel,
+      bmi: bmi,
+      tdee: tdee,
+    );
+
+    setState(() => _isSubmitting = true);
+
+    try {
+      final email = '${profile.name.toLowerCase().replaceAll(' ', '')}@getfit.local';
+      const password = '123456';
+
+      await context.read<SessionController>().register(
+            email: email,
+            password: password,
+            profile: profile,
+          );
+
+      if (!mounted) return;
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const HomeShell()),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Registration failed: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -162,163 +235,77 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         _fieldBox(
                           child: TextFormField(
                             controller: _nameController,
-                            decoration: _inputDecoration(
-                              'Full name',
-                              Icons.badge_outlined,
-                            ),
+                            decoration: _inputDecoration('Full name', Icons.badge_outlined),
                             validator: (value) =>
-                                value == null || value.trim().isEmpty
-                                ? 'Enter your name'
-                                : null,
+                                value == null || value.trim().isEmpty ? 'Enter your name' : null,
                           ),
                         ),
                         _fieldBox(
                           child: TextFormField(
                             controller: _ageController,
-                            decoration: _inputDecoration(
-                              'Age',
-                              Icons.cake_outlined,
-                            ),
+                            decoration: _inputDecoration('Age', Icons.cake_outlined),
                             keyboardType: TextInputType.number,
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty ? 'Enter your age' : null,
                           ),
                         ),
                         _fieldBox(
                           child: TextFormField(
                             controller: _heightController,
-                            decoration: _inputDecoration(
-                              'Height (cm)',
-                              Icons.height,
-                            ),
-                            keyboardType: TextInputType.number,
+                            decoration: _inputDecoration('Height (cm)', Icons.height),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty ? 'Enter your height' : null,
                           ),
                         ),
                         _fieldBox(
                           child: TextFormField(
                             controller: _weightController,
-                            decoration: _inputDecoration(
-                              'Weight (kg)',
-                              Icons.monitor_weight_outlined,
-                            ),
-                            keyboardType: TextInputType.number,
+                            decoration: _inputDecoration('Weight (kg)', Icons.monitor_weight_outlined),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            validator: (value) =>
+                                value == null || value.trim().isEmpty ? 'Enter your weight' : null,
                           ),
                         ),
-                        _fieldBox(
-                          child: DropdownButtonFormField<String>(
-                            initialValue: _sex,
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Color(0xFF2E7D32),
-                            ),
-                            dropdownColor: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            style: const TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            decoration: _dropdownDecoration(
-                              'Sex',
-                              Icons.wc_outlined,
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'male',
-                                child: Text('Male'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'female',
-                                child: Text('Female'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value == null) return;
-                              setState(() => _sex = value);
-                            },
-                          ),
+                        AppDropdownField<String>(
+                          label: 'Sex',
+                          value: _sex,
+                          items: const [
+                            DropdownMenuItem(value: 'male', child: Text('Male')),
+                            DropdownMenuItem(value: 'female', child: Text('Female')),
+                          ],
+                          onChanged: (value) {
+                            if (value == null) return;
+                            setState(() => _sex = value);
+                          },
                         ),
-                        _fieldBox(
-                          child: DropdownButtonFormField<String>(
-                            initialValue: _goal,
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Color(0xFF2E7D32),
-                            ),
-                            dropdownColor: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            style: const TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            decoration: _dropdownDecoration(
-                              'Goal',
-                              Icons.flag_outlined,
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'lose_weight',
-                                child: Text('Lose weight'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'maintain_weight',
-                                child: Text('Maintain weight'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'gain_weight',
-                                child: Text('Gain weight'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value == null) return;
-                              setState(() => _goal = value);
-                            },
-                          ),
+                        AppDropdownField<String>(
+                          label: 'Goal',
+                          value: _goal,
+                          items: const [
+                            DropdownMenuItem(value: 'lose_weight', child: Text('Lose weight')),
+                            DropdownMenuItem(value: 'maintain_weight', child: Text('Maintain weight')),
+                            DropdownMenuItem(value: 'gain_weight', child: Text('Gain weight')),
+                          ],
+                          onChanged: (value) {
+                            if (value == null) return;
+                            setState(() => _goal = value);
+                          },
                         ),
-                        _fieldBox(
-                          child: DropdownButtonFormField<String>(
-                            initialValue: _activityLevel,
-                            icon: const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: Color(0xFF2E7D32),
-                            ),
-                            dropdownColor: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            style: const TextStyle(
-                              color: Colors.black87,
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            decoration: _dropdownDecoration(
-                              'Activity level',
-                              Icons.directions_run_outlined,
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: 'sedentary',
-                                child: Text('Sedentary'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'lightly_active',
-                                child: Text('Lightly active'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'moderately_active',
-                                child: Text('Moderately active'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'active',
-                                child: Text('Active'),
-                              ),
-                              DropdownMenuItem(
-                                value: 'very_active',
-                                child: Text('Very active'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value == null) return;
-                              setState(() => _activityLevel = value);
-                            },
-                          ),
+                        AppDropdownField<String>(
+                          label: 'Activity level',
+                          value: _activityLevel,
+                          items: const [
+                            DropdownMenuItem(value: 'sedentary', child: Text('Sedentary')),
+                            DropdownMenuItem(value: 'lightly_active', child: Text('Lightly active')),
+                            DropdownMenuItem(value: 'moderately_active', child: Text('Moderately active')),
+                            DropdownMenuItem(value: 'active', child: Text('Active')),
+                            DropdownMenuItem(value: 'very_active', child: Text('Very active')),
+                          ],
+                          onChanged: (value) {
+                            if (value == null) return;
+                            setState(() => _activityLevel = value);
+                          },
                         ),
                       ],
                     ),
@@ -328,35 +315,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: FilledButton.icon(
                         style: FilledButton.styleFrom(
                           backgroundColor: const Color(0xFF2E7D32),
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 20,
-                            horizontal: 32,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 32),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           elevation: 0,
                         ),
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                builder: (_) => HomeShell(
-                                  userName: _nameController.text.trim().isEmpty
-                                      ? 'User'
-                                      : _nameController.text.trim(),
-                                ),
-                              ),
-                            );
-                          }
-                        },
+                        onPressed: _isSubmitting ? null : _submit,
                         icon: const Icon(Icons.arrow_forward),
-                        label: const Text(
-                          'Finish setup',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        label: Text(
+                          _isSubmitting ? 'Saving...' : 'Finish setup',
+                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                         ),
                       ),
                     ),
