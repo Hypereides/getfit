@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../core/state/session_controller.dart';
 import '../../dashboard/presentation/dashboard_screen.dart';
 import '../../meals/presentation/meal_recommendation_screen.dart';
 import '../../plans/presentation/my_plan_screen.dart';
@@ -7,9 +10,7 @@ import '../../progress/presentation/progress_screen.dart';
 import '../../workout_places/presentation/workout_place_screen.dart';
 
 class HomeShell extends StatefulWidget {
-  final String userName;
-
-  const HomeShell({super.key, required this.userName});
+  const HomeShell({super.key});
 
   @override
   State<HomeShell> createState() => _HomeShellState();
@@ -20,13 +21,24 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final session = context.watch<SessionController>();
+    final user = session.currentUser;
+
+    if (user == null) {
+      return const Scaffold(
+        body: Center(
+          child: Text('No logged in user found.'),
+        ),
+      );
+    }
+
     final screens = [
-      DashboardScreen(userName: widget.userName),
+      DashboardScreen(userName: user.profile.name),
       const MyPlanScreen(),
       const ProgressScreen(),
       const MealRecommendationScreen(),
       const WorkoutPlaceScreen(),
-      ProfileScreen(userName: widget.userName),
+      const ProfileScreen(),
     ];
 
     final isMobile = MediaQuery.of(context).size.width < 600;
