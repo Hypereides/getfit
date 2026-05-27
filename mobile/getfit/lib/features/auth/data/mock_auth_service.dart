@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import '../domain/app_user.dart';
+import '../domain/fitness_profile.dart';
 
 class MockAuthService {
   List<AppUser> _users = [];
@@ -40,7 +41,9 @@ class MockAuthService {
   }) async {
     await loadSeedUsers();
 
-    final exists = _users.any((u) => u.email.toLowerCase() == email.toLowerCase());
+    final exists = _users.any(
+      (u) => u.email.toLowerCase() == email.toLowerCase(),
+    );
     if (exists) {
       throw Exception('Email already exists');
     }
@@ -65,10 +68,12 @@ class MockAuthService {
 
   List<AppUser> getCoachClients(String coachId) {
     return _users
-        .where((u) =>
-            u.role == 'user' &&
-            u.premiumEnabled &&
-            u.selectedCoachId == coachId)
+        .where(
+          (u) =>
+              u.role == 'user' &&
+              u.premiumEnabled &&
+              u.selectedCoachId == coachId,
+        )
         .toList();
   }
 
