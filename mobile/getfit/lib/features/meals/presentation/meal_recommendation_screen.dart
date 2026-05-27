@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/widgets/app_dropdown_field.dart';
 import '../data/meal_recommendation_service.dart';
 import '../domain/meal_recommendation.dart';
 
@@ -37,31 +38,6 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
       _meals = meals;
       _isLoading = false;
     });
-  }
-
-  InputDecoration _buildDropdownDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(
-        color: Colors.grey[700],
-        fontWeight: FontWeight.w500,
-      ),
-      filled: true,
-      fillColor: Colors.grey[50],
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide(color: Colors.grey[300]!),
-      ),
-      focusedBorder: const OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(12)),
-        borderSide: BorderSide(color: Color(0xFF2E7D32), width: 2),
-      ),
-    );
   }
 
   @override
@@ -134,42 +110,29 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
               runSpacing: 16,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                SizedBox(
+                AppDropdownField<String>(
+                  label: 'Goal',
+                  value: _selectedGoal,
                   width: 280,
-                  child: DropdownButtonFormField<String>(
-                    initialValue: _selectedGoal,
-                    icon: const Icon(
-                      Icons.keyboard_arrow_down_rounded,
-                      color: Color(0xFF2E7D32),
+                  items: const [
+                    DropdownMenuItem(
+                      value: 'lose_weight',
+                      child: Text('Lose weight'),
                     ),
-                    dropdownColor: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                    style: const TextStyle(
-                      color: Colors.black87,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
+                    DropdownMenuItem(
+                      value: 'maintain_weight',
+                      child: Text('Maintain weight'),
                     ),
-                    decoration: _buildDropdownDecoration('Goal'),
-                    items: const [
-                      DropdownMenuItem(
-                        value: 'lose_weight',
-                        child: Text('Lose weight'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'maintain_weight',
-                        child: Text('Maintain weight'),
-                      ),
-                      DropdownMenuItem(
-                        value: 'gain_weight',
-                        child: Text('Gain weight'),
-                      ),
-                    ],
-                    onChanged: (value) {
-                      if (value == null) return;
-                      setState(() => _selectedGoal = value);
-                      _loadMeals();
-                    },
-                  ),
+                    DropdownMenuItem(
+                      value: 'gain_weight',
+                      child: Text('Gain weight'),
+                    ),
+                  ],
+                  onChanged: (value) {
+                    if (value == null) return;
+                    setState(() => _selectedGoal = value);
+                    _loadMeals();
+                  },
                 ),
                 FilledButton.icon(
                   style: FilledButton.styleFrom(
