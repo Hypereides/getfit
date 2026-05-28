@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import '../../auth/domain/app_user.dart';
 import '../domain/assigned_plan.dart';
 
@@ -8,27 +7,62 @@ class CoachPlanController extends ChangeNotifier {
 
   List<AssignedPlan> get plans => List.unmodifiable(_plans);
 
+  final List<PlanRequest> _requests = [];
+
+  List<PlanRequest> get requests => List.unmodifiable(_requests);
   List<AppUser> clientsForCoach({
     required AppUser coach,
     required List<AppUser> allUsers,
   }) {
-    return allUsers.where((user) {
-      return user.isUser &&
-          user.premiumEnabled &&
-          user.selectedCoachId == coach.id;
-    }).toList();
+    return allUsers
+        .where(
+          (user) =>
+              user.isUser &&
+              user.premiumEnabled &&
+              user.selectedCoachId == coach.id,
+        )
+        .toList();
   }
 
-  List<AssignedPlan> plansForClient(String clientId) {
-    return _plans.where((plan) => plan.clientId == clientId).toList();
-  }
+  List<AssignedPlan> plansForClient(String clientId) =>
+      _plans.where((p) => p.clientId == clientId).toList();
 
   AssignedPlan? latestPlanForClient(String clientId) {
     final clientPlans = plansForClient(clientId);
-    if (clientPlans.isEmpty) return null;
-    return clientPlans.last;
+    return clientPlans.isEmpty ? null : clientPlans.last;
   }
 
+
+  List<PlanRequest> pendingRequestsForCoach(String coachId) =>
+      _requests.where((r) => r.coachId == coachId).toList();
+
+  void requestPlan({
+    required String clientId,
+    required String clientName,
+    required String coachId,
+  }) {
+    final alreadyPending = _requests.any(
+      (r) => r.clientId == clientId && r.coachId == coachId,
+    );
+    if (alreadyPending) return;
+
+    _requests.add(
+      PlanRequest(
+        clientId: clientId,
+        clientName: clientName,
+        coachId: coachId,
+        requestedAt: DateTime.now(),
+      ),
+    );
+    notifyListeners();
+  }
+
+  void dismissRequest(String clientId) {
+    _requests.removeWhere((r) => r.clientId == clientId);
+    notifyListeners();
+  }
+
+  //create te assigned plan or updtae it 
   void createOrUpdatePlan({
     required AppUser client,
     required String title,
@@ -54,6 +88,8 @@ class CoachPlanController extends ChangeNotifier {
     );
 
     _plans.add(plan);
+    // if = pending 
+    dismissRequest(client.id);
     notifyListeners();
   }
 }

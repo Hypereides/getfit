@@ -25,3 +25,16 @@ class AssignedPlan {
     required this.isUpdated,
   });
 }
+class PlanRequest {
+  final String clientId;
+  final String clientName;
+  final String coachId;
+  final DateTime requestedAt;
+
+  PlanRequest({
+    required this.clientId,
+    required this.clientName,
+    required this.coachId,
+    required this.requestedAt,
+  });
+}

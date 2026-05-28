@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/state/session_controller.dart';
 import '../../coach_plans/presentation/coach_clients_screen.dart';
+import '../../coach_selection/presentation/get_coach_screen.dart';
 import '../../meals/presentation/meal_recommendation_screen.dart';
 import '../../profile/presentation/profile_screen.dart';
 import '../../progress/presentation/progress_screen.dart';
@@ -219,61 +220,155 @@ class _DashboardScreen extends StatelessWidget {
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24.0),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black..withValues(alpha: 0.08),
-              blurRadius: 24,
-              offset: const Offset(0, 12),
-            ),
-          ],
-        ),
-        padding: const EdgeInsets.all(48),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8F5E9),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(
-                    isCoach ? Icons.groups_rounded : Icons.dashboard_rounded,
-                    color: const Color(0xFF2E7D32),
-                    size: 32,
-                  ),
+      child: Column(
+        children: [
+          Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    isCoach ? 'Coach Dashboard' : 'Dashboard',
-                    style: const TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: -0.5,
+              ],
+            ),
+            padding: const EdgeInsets.all(48),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFE8F5E9),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(
+                        isCoach ? Icons.groups_rounded : Icons.dashboard_rounded,
+                        color: const Color(0xFF2E7D32),
+                        size: 32,
+                      ),
                     ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Text(
+                        isCoach ? 'Coach Dashboard' : 'Dashboard',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  isCoach
+                      ? 'Welcome back, ${user?.profile.name ?? 'Coach'}. Open Clients to view the premium users who selected you as their coach.'
+                      : 'Welcome back, ${user?.profile.name ?? 'User'}. Use My Plan, Progress, Meals, Places, and Profile to manage your fitness journey.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
+                    height: 1.5,
                   ),
                 ),
               ],
             ),
+          ),
+          if (!isCoach) ...[
             const SizedBox(height: 20),
-            Text(
-              isCoach
-                  ? 'Welcome back, ${user?.profile.name ?? 'Coach'}. Open Clients to view the premium users who selected you as their coach.'
-                  : 'Welcome back, ${user?.profile.name ?? 'User'}. Use My Plan, Progress, Meals, Places, and Profile to manage your fitness journey.',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-                height: 1.5,
-              ),
-            ),
+            _GetCoachCard(),
           ],
+        ],
+      ),
+    );
+  }
+}
+class _GetCoachCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2E7D32).withValues(alpha: 0.30),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(24),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (_) => const GetCoachScreen(),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.20),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(
+                    Icons.sports_outlined,
+                    color: Colors.white,
+                    size: 30,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                const Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Get a Coach',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: -0.3,
+                        ),
+                      ),
+                      SizedBox(height: 6),
+                      Text(
+                        'Browse coaches, view their profile, and request a personalised fitness plan.',
+                        style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 14,
+                          height: 1.4,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                const Icon(Icons.arrow_forward_ios_rounded,
+                    color: Colors.white70, size: 18),
+              ],
+            ),
+          ),
         ),
       ),
     );

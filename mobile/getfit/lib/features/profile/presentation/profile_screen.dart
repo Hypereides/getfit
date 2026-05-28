@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/state/session_controller.dart';
+import '../../../core/widgets/app_dropdown_field.dart';
 import '../../auth/domain/app_user.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -20,8 +21,9 @@ class ProfileScreen extends StatelessWidget {
           );
         }
 
-        final String initial =
-            user.profile.name.trim().isNotEmpty ? user.profile.name.trim()[0].toUpperCase() : 'U';
+        final String initial = user.profile.name.trim().isNotEmpty
+            ? user.profile.name.trim()[0].toUpperCase()
+            : 'U';
 
         return SingleChildScrollView(
           padding: const EdgeInsets.all(24.0),
@@ -190,16 +192,10 @@ class ProfileScreen extends StatelessWidget {
                         ),
                         if (user.premiumEnabled) ...[
                           const SizedBox(height: 20),
-                          DropdownButtonFormField<String>(
-                            initialValue: user.selectedCoachId,
-                            decoration: InputDecoration(
-                              labelText: 'Select Coach',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
+                          AppDropdownField<String>(
+                            label: 'Select Coach',
+                            value: user.selectedCoachId,
+                            width: double.infinity,
                             items: coaches
                                 .map(
                                   (coach) => DropdownMenuItem<String>(
