@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/state/session_controller.dart';
-import '../../../core/widgets/app_dropdown_field.dart';
 import '../../auth/domain/app_user.dart';
+import '../../auth/presentation/login_screen.dart';
+import '../../coach_selection/presentation/get_coach_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -16,9 +17,7 @@ class ProfileScreen extends StatelessWidget {
         final coaches = session.coaches;
 
         if (user == null) {
-          return const Center(
-            child: Text('No logged in user found.'),
-          );
+          return const Center(child: Text('No logged in user found.'));
         }
 
         final String initial = user.profile.name.trim().isNotEmpty
@@ -124,48 +123,28 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 48),
+
                 const Text(
                   'Your Stats Overview',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                 ),
                 const SizedBox(height: 24),
                 Wrap(
                   spacing: 24,
                   runSpacing: 24,
                   children: [
-                    _buildStatCard(
-                      'Current Goal',
-                      user.profile.goal,
-                      Icons.flag_outlined,
-                    ),
-                    _buildStatCard(
-                      'Activity Level',
-                      user.profile.activityLevel,
-                      Icons.directions_run,
-                    ),
-                    _buildStatCard(
-                      'Estimated BMI',
-                      user.profile.bmi.toStringAsFixed(1),
-                      Icons.monitor_weight_outlined,
-                    ),
-                    _buildStatCard(
-                      'Daily TDEE',
-                      '${user.profile.tdee.toStringAsFixed(0)} kcal',
-                      Icons.local_fire_department_outlined,
-                    ),
+                    _buildStatCard('Current Goal', user.profile.goal, Icons.flag_outlined),
+                    _buildStatCard('Activity Level', user.profile.activityLevel, Icons.directions_run),
+                    _buildStatCard('Estimated BMI', user.profile.bmi.toStringAsFixed(1), Icons.monitor_weight_outlined),
+                    _buildStatCard('Daily TDEE', '${user.profile.tdee.toStringAsFixed(0)} kcal', Icons.local_fire_department_outlined),
                   ],
                 ),
                 const SizedBox(height: 48),
+
                 if (user.isUser) ...[
                   const Text(
                     'Premium Coaching',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 20),
                   Container(
@@ -188,57 +167,130 @@ class ProfileScreen extends StatelessWidget {
                             'Unlock coach selection and premium coaching features.',
                           ),
                           value: user.premiumEnabled,
+                          activeColor: const Color(0xFF2E7D32),
                           onChanged: (value) => session.togglePremium(value),
                         ),
                         if (user.premiumEnabled) ...[
-                          const SizedBox(height: 20),
-                          AppDropdownField<String>(
-                            label: 'Select Coach',
-                            value: user.selectedCoachId,
-                            width: double.infinity,
-                            items: coaches
-                                .map(
-                                  (coach) => DropdownMenuItem<String>(
-                                    value: coach.id,
-                                    child: Text(coach.profile.name),
-                                  ),
-                                )
-                                .toList(),
-                            onChanged: (value) {
-                              if (value != null) {
-                                session.selectCoach(value);
-                              }
-                            },
+                          const SizedBox(height: 16),
+                          Divider(color: Colors.grey[200]),
+                          const SizedBox(height: 16),
+                          Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: user.selectedCoachId != null
+                                      ? const Color(0xFFE8F5E9)
+                                      : Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  Icons.sports_outlined,
+                                  color: user.selectedCoachId != null
+                                      ? const Color(0xFF2E7D32)
+                                      : Colors.grey[500],
+                                  size: 20,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      user.selectedCoachId == null
+                                          ? 'No coach assigned yet'
+                                          : 'Assigned coach',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    if (user.selectedCoachId != null)
+                                      Text(
+                                        _coachNameFromId(
+                                            coaches, user.selectedCoachId!),
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: Color(0xFF2E7D32),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                           const SizedBox(height: 16),
-                          Text(
-                            user.selectedCoachId == null
-                                ? 'No coach selected yet.'
-                                : 'Selected coach: ${_coachNameFromId(coaches, user.selectedCoachId!)}',
-                            style: TextStyle(
-                              color: Colors.grey[700],
-                              fontSize: 14,
+                          OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Color(0xFF2E7D32)),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 20,
+                                vertical: 14,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => const GetCoachScreen(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(
+                              Icons.search_rounded,
+                              color: Color(0xFF2E7D32),
+                            ),
+                            label: Text(
+                              user.selectedCoachId == null
+                                  ? 'Browse & Request a Coach'
+                                  : 'Change Coach',
+                              style: const TextStyle(
+                                color: Color(0xFF2E7D32),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
                       ],
                     ),
                   ),
+                  const SizedBox(height: 48),
                 ],
-                const SizedBox(height: 48),
+
                 Divider(color: Colors.grey[200]),
                 const SizedBox(height: 16),
-                TextButton.icon(
-                  onPressed: () {},
-                  icon: Icon(
-                    Icons.settings_outlined,
-                    color: Colors.grey[700],
-                  ),
-                  label: Text(
-                    'Account Settings',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 16,
+                //logoutt button
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.red[300]!),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () {
+                      session.logout();
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (_) => const LoginScreen(),
+                        ),
+                        (route) => false,
+                      );
+                    },
+                    icon: Icon(Icons.logout_rounded, color: Colors.red[400]),
+                    label: Text(
+                      'Log Out',
+                      style: TextStyle(
+                        color: Colors.red[400],
+                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                      ),
                     ),
                   ),
                 ),
