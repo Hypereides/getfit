@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/state/session_controller.dart';
 import '../../coach_plans/presentation/coach_clients_screen.dart';
 import '../../coach_selection/presentation/get_coach_screen.dart';
-import '../../meals/presentation/meal_recommendation_screen.dart';
+import '../../meals/presentation/recommended_meals_screen.dart';
 import '../../profile/presentation/profile_screen.dart';
 import '../../progress/presentation/progress_screen.dart';
 import '../../workout_places/presentation/workout_place_screen.dart';
@@ -39,7 +39,7 @@ class _HomeShellState extends State<HomeShell> {
       const _DashboardScreen(isCoach: false),
       const MyPlanScreen(),
       const ProgressScreen(),
-      const MealRecommendationScreen(),
+      const RecommendedMealsScreen(),
       const WorkoutPlaceScreen(),
       const ProfileScreen(),
     ];
@@ -102,7 +102,7 @@ class _HomeShellState extends State<HomeShell> {
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.restaurant_menu_outlined),
-                        label: 'Meals',
+                        label: 'Recommend a Meal',
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.place_outlined),
