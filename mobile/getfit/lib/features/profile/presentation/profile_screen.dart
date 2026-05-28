@@ -123,7 +123,6 @@ class ProfileScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 48),
-
                 const Text(
                   'Your Stats Overview',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
@@ -167,7 +166,7 @@ class ProfileScreen extends StatelessWidget {
                             'Unlock coach selection and premium coaching features.',
                           ),
                           value: user.premiumEnabled,
-                          activeColor: const Color(0xFF2E7D32),
+                          activeThumbColor: const Color(0xFF2E7D32),
                           onChanged: (value) => session.togglePremium(value),
                         ),
                         if (user.premiumEnabled) ...[
@@ -260,10 +259,8 @@ class ProfileScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 48),
                 ],
-
                 Divider(color: Colors.grey[200]),
                 const SizedBox(height: 16),
-                //logoutt button
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(

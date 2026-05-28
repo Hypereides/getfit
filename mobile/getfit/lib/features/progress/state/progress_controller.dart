@@ -79,9 +79,7 @@ class ProgressController extends ChangeNotifier {
         .toList();
 
     if (thisWeek.isNotEmpty && lastWeek.isNotEmpty) {
-      final avg = (List<ProgressEntry> list) =>
-          list.map((e) => e.weightKg).reduce((a, b) => a + b) / list.length;
-      return avg(thisWeek) - avg(lastWeek);
+      return _avg(thisWeek) - _avg(lastWeek);
     }
 
     if (s.length >= 2) return s.last.weightKg - s.first.weightKg;
@@ -98,3 +96,6 @@ class ProgressController extends ChangeNotifier {
     notifyListeners();
   }
 }
+
+double _avg(List<ProgressEntry> entries) =>
+    entries.map((e) => e.weightKg).reduce((a, b) => a + b) / entries.length;

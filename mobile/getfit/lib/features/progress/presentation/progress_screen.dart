@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/state/session_controller.dart';
+import '../../health_sync/presentation/health_sync_screen.dart';
+import '../../health_sync/state/health_sync_controller.dart';
 import '../../workouts/state/workout_controller.dart';
 import '../domain/progress_entry.dart';
 import '../state/progress_controller.dart';
@@ -69,7 +71,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final workouts = context.watch<WorkoutController>();
     final user = session.currentUser;
     final profile = user?.profile;
-
     final double profileWeight = profile?.weightKg ?? 0;
     final double heightM = (profile?.heightCm ?? 0) / 100;
     final double displayWeight = progress.currentWeight ?? profileWeight;
@@ -121,7 +122,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
               ],
             ),
             const SizedBox(height: 40),
-
+            _GoogleFitBanner(),
+            const SizedBox(height: 40),
             _sectionTitle('Weight Summary'),
             const SizedBox(height: 16),
             Wrap(
@@ -303,7 +305,6 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 },
               ),
             ],
-            //will act as the "history" for any measurement 
             if (progress.sortedEntries.isNotEmpty) ...[
               const SizedBox(height: 48),
               Divider(color: Colors.grey[200]),
@@ -595,7 +596,6 @@ class _SummaryCard extends StatelessWidget {
   }
 }
 
-
 class _IndicatorTile extends StatelessWidget {
   const _IndicatorTile({
     required this.icon,
@@ -695,7 +695,6 @@ class _TrendCard extends StatelessWidget {
         ),
       );
     }
-
     final isPositive = change! > 0;
     final isGoodChange = goal == 'gain_weight' ? isPositive : !isPositive;
     final isNeutral = change!.abs() < 0.05;
@@ -817,6 +816,88 @@ class _HistoryRow extends StatelessWidget {
             onPressed: onDelete,
           ),
         ],
+      ),
+    );
+  }
+}
+
+
+class _GoogleFitBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final ctrl = context.watch<HealthSyncController>();
+    final isConnected = ctrl.isConnected;
+    final snapshot = ctrl.snapshot;
+
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const HealthSyncScreen()),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: isConnected
+                  ? [const Color(0xFF0D47A1), const Color(0xFF1976D2)]
+                  : [Colors.grey[700]!, Colors.grey[600]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.monitor_heart_rounded,
+                  color: Colors.white, size: 28),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isConnected ? 'Google Fit — Synced' : 'Connect Google Fit',
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15),
+                    ),
+                    Text(
+                      isConnected && snapshot != null
+                          ? '${snapshot.steps} steps · ${snapshot.activeMinutes} active min today'
+                          : 'Tap to sync steps, calories and activity data',
+                      style: const TextStyle(
+                          color: Colors.white70, fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+              if (isConnected)
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.greenAccent.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Colors.greenAccent),
+                  ),
+                  child: const Text('Connected',
+                      style: TextStyle(
+                          color: Colors.greenAccent,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700)),
+                )
+              else
+                const Icon(Icons.arrow_forward_ios_rounded,
+                    color: Colors.white60, size: 16),
+            ],
+          ),
+        ),
       ),
     );
   }
