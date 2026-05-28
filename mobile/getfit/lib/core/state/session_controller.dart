@@ -18,6 +18,7 @@ class SessionController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   List<AppUser> get coaches => List.unmodifiable(_coaches);
+  List<AppUser> get users => _authService.users;
   bool get isLoggedIn => _currentUser != null;
 
   Future<void> initialize() async {
@@ -94,6 +95,7 @@ class SessionController extends ChangeNotifier {
     );
 
     _currentUser = _authService.updateUser(updatedUser);
+    _coaches = _authService.getCoaches();
     notifyListeners();
   }
 
@@ -105,6 +107,7 @@ class SessionController extends ChangeNotifier {
     );
 
     _currentUser = _authService.updateUser(updatedUser);
+    _coaches = _authService.getCoaches();
     notifyListeners();
   }
 
@@ -114,6 +117,7 @@ class SessionController extends ChangeNotifier {
     final updatedUser = _currentUser!.copyWith(profile: profile);
 
     _currentUser = _authService.updateUser(updatedUser);
+    _coaches = _authService.getCoaches();
     notifyListeners();
   }
 }
