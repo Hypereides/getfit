@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSHealthShareUsageDescription</key>
+	<string>GetFit reads your activity data to track progress.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>GetFit needs camera access to scan food barcodes.</string>
 	<key>CFBundleDevelopmentRegion</key>
