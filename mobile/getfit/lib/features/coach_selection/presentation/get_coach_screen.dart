@@ -243,8 +243,6 @@ class _CoachCard extends StatelessWidget {
                       duration: const Duration(seconds: 3),
                     ),
                   );
-
-                  // Pop back to wherever the user came from
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
