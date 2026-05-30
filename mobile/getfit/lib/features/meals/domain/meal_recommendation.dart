@@ -1,3 +1,5 @@
+import 'meal_ingredient.dart';
+
 class MealRecommendation {
   final String id;
   final String title;
@@ -7,6 +9,8 @@ class MealRecommendation {
   final int carbsGrams;
   final int fatsGrams;
   final String description;
+  final String imageEmoji;
+  final List<MealIngredient> ingredients;
 
   const MealRecommendation({
     required this.id,
@@ -17,5 +21,7 @@ class MealRecommendation {
     required this.carbsGrams,
     required this.fatsGrams,
     required this.description,
+    this.imageEmoji = '🍽️',
+    this.ingredients = const [],
   });
 }

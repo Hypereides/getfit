@@ -7,6 +7,7 @@ import '../../barcode/domain/food_product.dart';
 import '../../barcode/presentation/barcode_scan_screen.dart';
 import '../../barcode/presentation/food_detail_screen.dart';
 import '../../barcode/state/food_log_controller.dart';
+import '../../store_meals/presentation/store_list_screen.dart';
 import '../data/meal_recommendation_service.dart';
 import '../domain/meal_recommendation.dart';
 import '../state/my_meals_controller.dart';
@@ -80,8 +81,6 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
       ),
     );
   }
-
-
   void _onConfirmMeal(MealRecommendation meal) {
     final myMeals = context.read<MyMealsController>();
     final shopping = context.read<ShoppingListController>();
@@ -199,6 +198,8 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
           const SizedBox(height: 36),
 
           _BarcodeScanCard(),
+          const SizedBox(height: 16),
+          _StoreMealCard(),
           const SizedBox(height: 36),
           _sectionTitle('Search Food Database'),
           const SizedBox(height: 4),
@@ -549,6 +550,59 @@ class _ShoppingListSheet extends StatelessWidget {
           ]),
         );
       },
+    );
+  }
+}
+class _StoreMealCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const StoreListScreen()),
+        ),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF6A1B9A), Color(0xFFAB47BC)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(20),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF6A1B9A).withValues(alpha: 0.28),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(24),
+          child: Row(children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 28),
+            ),
+            const SizedBox(width: 18),
+            const Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Log Store Meal', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text(
+                'Browse local restaurants and log a meal directly from their menu.',
+                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+              ),
+            ])),
+            const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white60, size: 16),
+          ]),
+        ),
+      ),
     );
   }
 }

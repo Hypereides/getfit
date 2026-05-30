@@ -283,6 +283,10 @@ class _DashboardScreen extends StatelessWidget {
           if (!isCoach) ...[
             const SizedBox(height: 20),
             _GetCoachCard(),
+            const SizedBox(height: 16),
+            _MealRecommendationCard(),
+            const SizedBox(height: 16),
+            _WorkoutPlaceCard(),
           ],
         ],
       ),
@@ -292,18 +296,119 @@ class _DashboardScreen extends StatelessWidget {
 class _GetCoachCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    return _DashboardShortcutCard(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      shadowColor: const Color(0xFF2E7D32),
+      icon: Icons.sports_outlined,
+      title: 'Get a Coach',
+      subtitle:
+          'Browse coaches, view their profile, and request a personalised fitness plan.',
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const GetCoachScreen()),
+        );
+      },
+    );
+  }
+}
+class _MealRecommendationCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _DashboardShortcutCard(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      shadowColor: const Color(0xFF1565C0),
+      icon: Icons.restaurant_menu_rounded,
+      title: 'Meal Recommendations',
+      subtitle:
+          'Get personalised meal suggestions based on your remaining daily calories and fitness goal.',
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => Scaffold(
+              backgroundColor: const Color(0xFFF7F8FA),
+              appBar: AppBar(
+                title: const Text('Meals & Nutrition'),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+                elevation: 0,
+              ),
+              body: const MealRecommendationScreen(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _WorkoutPlaceCard extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return _DashboardShortcutCard(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF6A1B9A), Color(0xFFAB47BC)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+      shadowColor: const Color(0xFF6A1B9A),
+      icon: Icons.place_rounded,
+      title: 'Find a Workout Place',
+      subtitle:
+          'Discover nearby gyms, CrossFit boxes and outdoor tracks that are open right now.',
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => Scaffold(
+              backgroundColor: const Color(0xFFF7F8FA),
+              appBar: AppBar(
+                title: const Text('Find a Workout Place'),
+                backgroundColor: Colors.white,
+                foregroundColor: Colors.black87,
+                elevation: 0,
+              ),
+              body: const WorkoutPlaceScreen(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+class _DashboardShortcutCard extends StatelessWidget {
+  const _DashboardShortcutCard({
+    required this.gradient,
+    required this.shadowColor,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final LinearGradient gradient;
+  final Color shadowColor;
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        gradient: gradient,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2E7D32).withValues(alpha: 0.30),
+            color: shadowColor.withValues(alpha: 0.30),
             blurRadius: 24,
             offset: const Offset(0, 12),
           ),
@@ -314,15 +419,9 @@ class _GetCoachCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         child: InkWell(
           borderRadius: BorderRadius.circular(24),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => const GetCoachScreen(),
-              ),
-            );
-          },
+          onTap: onTap,
           child: Padding(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(28),
             child: Row(
               children: [
                 Container(
@@ -331,32 +430,28 @@ class _GetCoachCard extends StatelessWidget {
                     color: Colors.white.withValues(alpha: 0.20),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(
-                    Icons.sports_outlined,
-                    color: Colors.white,
-                    size: 30,
-                  ),
+                  child: Icon(icon, color: Colors.white, size: 30),
                 ),
                 const SizedBox(width: 20),
-                const Expanded(
+                Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Get a Coach',
-                        style: TextStyle(
+                        title,
+                        style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 22,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                           letterSpacing: -0.3,
                         ),
                       ),
-                      SizedBox(height: 6),
+                      const SizedBox(height: 6),
                       Text(
-                        'Browse coaches, view their profile, and request a personalised fitness plan.',
-                        style: TextStyle(
+                        subtitle,
+                        style: const TextStyle(
                           color: Colors.white70,
-                          fontSize: 14,
+                          fontSize: 13,
                           height: 1.4,
                         ),
                       ),

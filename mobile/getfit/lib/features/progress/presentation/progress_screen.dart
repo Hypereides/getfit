@@ -77,6 +77,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final double bmi = heightM > 0 ? displayWeight / (heightM * heightM) : 0;
     final double tdee = profile?.tdee ?? 0;
     final double waterL = displayWeight * 0.033;
+
     final sw = MediaQuery.of(context).size.width;
     final isMobile = sw < 600;
     final outerPad = isMobile ? 12.0 : 24.0;
@@ -268,7 +269,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             const SizedBox(height: 40),
             Row(
               children: [
-                Flexible(child: _sectionTitle('Log a Measurement')),
+                Flexible(child: _sectionTitle('Log a Measurement')), // overflow fix
                 const SizedBox(width: 12),
                 if (!_showForm)
                   FilledButton.icon(
@@ -338,9 +339,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
           children: [
             Icon(Icons.info_outline, color: Colors.grey[400]),
             const SizedBox(width: 14),
-            Text(
-              'Log at least 2 measurements to see trends.',
-              style: TextStyle(color: Colors.grey[600], fontSize: 15),
+            Expanded(
+              child: Text(
+                'Log at least 2 measurements to see trends.',
+                style: TextStyle(color: Colors.grey[600], fontSize: 15),
+              ),
             ),
           ],
         ),

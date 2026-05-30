@@ -37,23 +37,29 @@ class MockAuthService {
   Future<AppUser> register({
     required String email,
     required String password,
+    required String username,
+    required bool premiumEnabled,
     required FitnessProfile profile,
   }) async {
     await loadSeedUsers();
 
-    final exists = _users.any(
+    final emailExists = _users.any(
       (u) => u.email.toLowerCase() == email.toLowerCase(),
     );
-    if (exists) {
-      throw Exception('Email already exists');
-    }
+    if (emailExists) throw Exception('Email already exists');
+
+    final usernameExists = _users.any(
+      (u) => u.username.toLowerCase() == username.toLowerCase(),
+    );
+    if (usernameExists) throw Exception('Username already taken');
 
     final user = AppUser(
       id: 'user_${_users.length + 1}',
+      username: username.trim(),
       email: email.trim(),
       password: password.trim(),
       role: 'user',
-      premiumEnabled: false,
+      premiumEnabled: premiumEnabled,
       selectedCoachId: null,
       profile: profile,
     );
@@ -62,25 +68,19 @@ class MockAuthService {
     return user;
   }
 
-  List<AppUser> getCoaches() {
-    return _users.where((u) => u.role == 'coach').toList();
-  }
+  List<AppUser> getCoaches() =>
+      _users.where((u) => u.role == 'coach').toList();
 
-  List<AppUser> getCoachClients(String coachId) {
-    return _users
-        .where(
-          (u) =>
-              u.role == 'user' &&
-              u.premiumEnabled &&
-              u.selectedCoachId == coachId,
-        )
-        .toList();
-  }
+  List<AppUser> getCoachClients(String coachId) => _users
+      .where((u) =>
+          u.role == 'user' &&
+          u.premiumEnabled &&
+          u.selectedCoachId == coachId)
+      .toList();
 
   AppUser updateUser(AppUser updatedUser) {
     final index = _users.indexWhere((u) => u.id == updatedUser.id);
     if (index == -1) throw Exception('User not found');
-
     _users[index] = updatedUser;
     return _users[index];
   }
