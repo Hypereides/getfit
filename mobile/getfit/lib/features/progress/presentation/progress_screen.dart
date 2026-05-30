@@ -77,9 +77,13 @@ class _ProgressScreenState extends State<ProgressScreen> {
     final double bmi = heightM > 0 ? displayWeight / (heightM * heightM) : 0;
     final double tdee = profile?.tdee ?? 0;
     final double waterL = displayWeight * 0.033;
+    final sw = MediaQuery.of(context).size.width;
+    final isMobile = sw < 600;
+    final outerPad = isMobile ? 12.0 : 24.0;
+    final innerPad = isMobile ? 20.0 : 48.0;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+      padding: EdgeInsets.all(outerPad),
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -92,7 +96,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ),
           ],
         ),
-        padding: const EdgeInsets.all(48),
+        padding: EdgeInsets.all(innerPad),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -111,12 +115,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                const Text(
-                  'Progress & Tracking',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
+                const Expanded(
+                  child: Text(
+                    'Progress & Tracking',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
                   ),
                 ),
               ],
@@ -190,18 +196,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 _IndicatorTile(
                   icon: Icons.local_fire_department_outlined,
                   label: 'Daily TDEE',
-                  value: tdee > 0
-                      ? '${tdee.toStringAsFixed(0)} kcal'
-                      : '—',
+                  value: tdee > 0 ? '${tdee.toStringAsFixed(0)} kcal' : '—',
                   sub: 'maintenance calories',
                   iconColor: Colors.orange,
                 ),
                 _IndicatorTile(
                   icon: Icons.water_drop_outlined,
                   label: 'Water Target',
-                  value: displayWeight > 0
-                      ? '${waterL.toStringAsFixed(1)} L'
-                      : '—',
+                  value: displayWeight > 0 ? '${waterL.toStringAsFixed(1)} L' : '—',
                   sub: '33 ml / kg bodyweight',
                   iconColor: Colors.blue,
                 ),
@@ -223,12 +225,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
                   icon: Icons.calendar_today_rounded,
                   label: 'Tracking Streak',
                   value: '${progress.streak} day${progress.streak == 1 ? '' : 's'}',
-                  sub: progress.streak > 0
-                      ? 'keep it up!'
-                      : 'log today to start',
-                  iconColor: progress.streak > 0
-                      ? Colors.amber[700]!
-                      : Colors.grey,
+                  sub: progress.streak > 0 ? 'keep it up!' : 'log today to start',
+                  iconColor: progress.streak > 0 ? Colors.amber[700]! : Colors.grey,
                 ),
               ],
             ),
@@ -270,23 +268,18 @@ class _ProgressScreenState extends State<ProgressScreen> {
             const SizedBox(height: 40),
             Row(
               children: [
-                _sectionTitle('Log a Measurement'),
-                const Spacer(),
+                Flexible(child: _sectionTitle('Log a Measurement')),
+                const SizedBox(width: 12),
                 if (!_showForm)
                   FilledButton.icon(
                     style: FilledButton.styleFrom(
                       backgroundColor: const Color(0xFF2E7D32),
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 14),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: () => setState(() => _showForm = true),
                     icon: const Icon(Icons.add_rounded),
-                    label: const Text(
-                      'Add',
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
+                    label: const Text('Add', style: TextStyle(fontWeight: FontWeight.w600)),
                   ),
               ],
             ),
@@ -391,8 +384,7 @@ class _LogForm extends StatelessWidget {
         prefixIcon: Icon(icon, color: Colors.grey[600]),
         filled: true,
         fillColor: Colors.grey[50],
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -414,107 +406,96 @@ class _LogForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8FBF8),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFCFE8D1)),
-      ),
-      child: Form(
-        key: formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'New Measurement',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: [
-                SizedBox(
-                  width: 260,
-                  child: TextFormField(
-                    controller: weightCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true),
-                    decoration: _dec('Weight (kg) *', Icons.monitor_weight_outlined),
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) {
-                        return 'Weight is required';
-                      }
-                      final val = double.tryParse(v.trim());
-                      if (val == null) return 'Enter a valid number';
-                      if (val <= 0) return 'Weight must be greater than 0';
-                      if (val > 500) return 'Weight seems too high';
-                      return null;
-                    },
-                  ),
-                ),
-                SizedBox(
-                  width: 260,
-                  child: TextFormField(
-                    controller: fatCtrl,
-                    keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true),
-                    decoration:
-                        _dec('Body Fat % (optional)', Icons.percent_rounded),
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) return null;
-                      final val = double.tryParse(v.trim());
-                      if (val == null) return 'Enter a valid number';
-                      if (val <= 0 || val >= 100) {
-                        return 'Body fat must be between 0 and 100';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Wrap(
-              spacing: 12,
-              runSpacing: 12,
-              children: [
-                FilledButton.icon(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF2E7D32),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: onSubmit,
-                  icon: const Icon(Icons.save_outlined),
-                  label: const Text(
-                    'Save Measurement',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
-                OutlinedButton(
-                  style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: Colors.grey[400]!),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: onCancel,
-                  child: Text(
-                    'Cancel',
-                    style: TextStyle(color: Colors.grey[700]),
-                  ),
-                ),
-              ],
-            ),
-          ],
+    return LayoutBuilder(builder: (context, constraints) {
+      final fieldWidth = constraints.maxWidth > 560
+          ? 260.0
+          : double.infinity;
+
+      return Container(
+        padding: const EdgeInsets.all(28),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8FBF8),
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: const Color(0xFFCFE8D1)),
         ),
-      ),
-    );
+        child: Form(
+          key: formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'New Measurement',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Wrap(
+                spacing: 20,
+                runSpacing: 20,
+                children: [
+                  SizedBox(
+                    width: fieldWidth,
+                    child: TextFormField(
+                      controller: weightCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: _dec('Weight (kg) *', Icons.monitor_weight_outlined),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) return 'Weight is required';
+                        final val = double.tryParse(v.trim());
+                        if (val == null) return 'Enter a valid number';
+                        if (val <= 0) return 'Weight must be greater than 0';
+                        if (val > 500) return 'Weight seems too high';
+                        return null;
+                      },
+                    ),
+                  ),
+                  SizedBox(
+                    width: fieldWidth,
+                    child: TextFormField(
+                      controller: fatCtrl,
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      decoration: _dec('Body Fat % (optional)', Icons.percent_rounded),
+                      validator: (v) {
+                        if (v == null || v.trim().isEmpty) return null;
+                        final val = double.tryParse(v.trim());
+                        if (val == null) return 'Enter a valid number';
+                        if (val <= 0 || val >= 100) return 'Body fat must be between 0 and 100';
+                        return null;
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  FilledButton.icon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: const Color(0xFF2E7D32),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: onSubmit,
+                    icon: const Icon(Icons.save_outlined),
+                    label: const Text('Save Measurement', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: BorderSide(color: Colors.grey[400]!),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    onPressed: onCancel,
+                    child: Text('Cancel', style: TextStyle(color: Colors.grey[700])),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    });
   }
 }
 
@@ -554,47 +535,28 @@ class _SummaryCard extends StatelessWidget {
         color: highlighted ? const Color(0xFFE8F5E9) : Colors.grey[50],
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: highlighted
-              ? const Color(0xFFA5D6A7)
-              : Colors.grey[200]!,
+          color: highlighted ? const Color(0xFFA5D6A7) : Colors.grey[200]!,
         ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(
-            icon,
-            color: highlighted ? const Color(0xFF2E7D32) : Colors.grey[500],
-            size: 26,
-          ),
+          Icon(icon, color: highlighted ? const Color(0xFF2E7D32) : Colors.grey[500], size: 26),
           const SizedBox(height: 14),
-          Text(
-            title,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(title, style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500)),
           const SizedBox(height: 6),
           Text(
             value,
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: accentColor ?? const Color(0xFF1B1B1B),
-            ),
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: accentColor ?? const Color(0xFF1B1B1B)),
           ),
           const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-          ),
+          Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
         ],
       ),
     );
   }
 }
+
 
 class _IndicatorTile extends StatelessWidget {
   const _IndicatorTile({
@@ -613,8 +575,11 @@ class _IndicatorTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final sw = MediaQuery.of(context).size.width;
+    final tileWidth = sw < 600 ? double.infinity : 220.0;
+
     return Container(
-      width: 220,
+      width: tileWidth,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.grey[50],
@@ -636,26 +601,10 @@ class _IndicatorTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: Colors.grey[600],
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500)),
                 const SizedBox(height: 3),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text(
-                  sub,
-                  style: TextStyle(fontSize: 11, color: Colors.grey[500]),
-                ),
+                Text(value, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                Text(sub, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
               ],
             ),
           ),
@@ -689,10 +638,7 @@ class _TrendCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: Colors.grey[200]!),
         ),
-        child: Text(
-          '$label: not enough data',
-          style: TextStyle(color: Colors.grey[500]),
-        ),
+        child: Text('$label: not enough data', style: TextStyle(color: Colors.grey[500])),
       );
     }
     final isPositive = change! > 0;
@@ -724,36 +670,20 @@ class _TrendCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Text(
-            subtitle,
-            style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-          ),
+          Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+          Text(subtitle, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
           const SizedBox(height: 14),
           Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                decoration: BoxDecoration(color: color.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
                 child: Icon(arrow, color: color, size: 20),
               ),
               const SizedBox(width: 12),
               Text(
                 '$sign${change!.toStringAsFixed(2)} kg',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: color,
-                ),
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color),
               ),
             ],
           ),
@@ -762,7 +692,6 @@ class _TrendCard extends StatelessWidget {
     );
   }
 }
-
 
 class _HistoryRow extends StatelessWidget {
   const _HistoryRow({required this.entry, required this.onDelete});
@@ -786,8 +715,7 @@ class _HistoryRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.monitor_weight_outlined,
-              color: Color(0xFF2E7D32), size: 20),
+          const Icon(Icons.monitor_weight_outlined, color: Color(0xFF2E7D32), size: 20),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
@@ -796,16 +724,10 @@ class _HistoryRow extends StatelessWidget {
                 Text(
                   '${entry.weightKg.toStringAsFixed(1)} kg'
                   '${entry.bodyFatPercent != null ? '  ·  ${entry.bodyFatPercent!.toStringAsFixed(1)} % fat' : ''}',
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 3),
-                Text(
-                  dateStr,
-                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
-                ),
+                Text(dateStr, style: TextStyle(fontSize: 12, color: Colors.grey[500])),
               ],
             ),
           ),
@@ -820,7 +742,6 @@ class _HistoryRow extends StatelessWidget {
     );
   }
 }
-
 
 class _GoogleFitBanner extends StatelessWidget {
   @override
@@ -853,8 +774,7 @@ class _GoogleFitBanner extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(Icons.monitor_heart_rounded,
-                  color: Colors.white, size: 28),
+              const Icon(Icons.monitor_heart_rounded, color: Colors.white, size: 28),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
@@ -862,39 +782,30 @@ class _GoogleFitBanner extends StatelessWidget {
                   children: [
                     Text(
                       isConnected ? 'Google Fit — Synced' : 'Connect Google Fit',
-                      style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 15),
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                     Text(
                       isConnected && snapshot != null
                           ? '${snapshot.steps} steps · ${snapshot.activeMinutes} active min today'
                           : 'Tap to sync steps, calories and activity data',
-                      style: const TextStyle(
-                          color: Colors.white70, fontSize: 13),
+                      style: const TextStyle(color: Colors.white70, fontSize: 13),
                     ),
                   ],
                 ),
               ),
               if (isConnected)
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
                     color: Colors.greenAccent.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(20),
                     border: Border.all(color: Colors.greenAccent),
                   ),
                   child: const Text('Connected',
-                      style: TextStyle(
-                          color: Colors.greenAccent,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700)),
+                      style: TextStyle(color: Colors.greenAccent, fontSize: 11, fontWeight: FontWeight.w700)),
                 )
               else
-                const Icon(Icons.arrow_forward_ios_rounded,
-                    color: Colors.white60, size: 16),
+                const Icon(Icons.arrow_forward_ios_rounded, color: Colors.white60, size: 16),
             ],
           ),
         ),
