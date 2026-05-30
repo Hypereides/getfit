@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:health/health.dart';
 
 import '../../auth/domain/fitness_profile.dart';
-import '../domain/health_snapshot.dart';
-import '../domain/weekly_goal.dart';
+import '../domain/daily_progress.dart';
+import '../domain/activity_goal.dart';
 
 enum FitConnectionStatus {
   disconnected,
@@ -13,17 +13,17 @@ enum FitConnectionStatus {
   error,
 }
 
-class HealthSyncController extends ChangeNotifier {
+class GoogleFitConnector extends ChangeNotifier {
   FitConnectionStatus _status = FitConnectionStatus.disconnected;
-  HealthSnapshot? _snapshot;
-  WeeklyGoal? _weeklyGoal;
-  WeeklyGoal? _suggestedGoal;
+  DailyProgress? _snapshot;
+  ActivityGoal? _weeklyGoal;
+  ActivityGoal? _suggestedGoal;
   String? _errorMessage;
 
   FitConnectionStatus get status => _status;
-  HealthSnapshot? get snapshot => _snapshot;
-  WeeklyGoal? get weeklyGoal => _weeklyGoal;
-  WeeklyGoal? get suggestedGoal => _suggestedGoal;
+  DailyProgress? get snapshot => _snapshot;
+  ActivityGoal? get weeklyGoal => _weeklyGoal;
+  ActivityGoal? get suggestedGoal => _suggestedGoal;
   String? get errorMessage => _errorMessage;
   bool get isConnected => _status == FitConnectionStatus.connected;
 
@@ -33,8 +33,7 @@ class HealthSyncController extends ChangeNotifier {
     HealthDataType.HEART_RATE,
     HealthDataType.DISTANCE_WALKING_RUNNING,
   ];
-
-  Future<void> connect() async {
+  Future<void> requestConnection() async {
     _status = FitConnectionStatus.connecting;
     _errorMessage = null;
     notifyListeners();
@@ -55,7 +54,7 @@ class HealthSyncController extends ChangeNotifier {
         return;
       }
 
-      await _fetchRealData(health);
+      await _retrieveActivityData(health);
       _status = FitConnectionStatus.connected;
     } catch (_) {
       await _loadDemoData();
@@ -64,7 +63,8 @@ class HealthSyncController extends ChangeNotifier {
 
     notifyListeners();
   }
-  Future<void> _fetchRealData(Health health) async {
+
+  Future<void> _retrieveActivityData(Health health) async {
     final now = DateTime.now();
     final startOfDay = DateTime(now.year, now.month, now.day);
 
@@ -98,14 +98,15 @@ class HealthSyncController extends ChangeNotifier {
           break;
       }
     }
+
     final activeMinutes = steps > 0 ? (steps / 100).round() : 0;
-  //no meaningful data are to be fetched since this is simply for our uni project thus there will be a demo snapshot
+
     if (steps == 0 && calories == 0) {
       await _loadDemoData();
       return;
     }
 
-    _snapshot = HealthSnapshot(
+    _snapshot = DailyProgress(
       steps: steps.round(),
       activeMinutes: activeMinutes,
       caloriesBurned: calories,
@@ -118,7 +119,7 @@ class HealthSyncController extends ChangeNotifier {
 
   Future<void> _loadDemoData() async {
     await Future.delayed(const Duration(milliseconds: 800));
-    _snapshot = HealthSnapshot(
+    _snapshot = DailyProgress(
       steps: 7842,
       activeMinutes: 54,
       caloriesBurned: 348,
@@ -133,13 +134,14 @@ class HealthSyncController extends ChangeNotifier {
     if (!isConnected) return;
     try {
       final health = Health();
-      await _fetchRealData(health);
+      await _retrieveActivityData(health);
     } catch (_) {
       await _loadDemoData();
     }
     notifyListeners();
   }
-  WeeklyGoal generateSuggestion(FitnessProfile profile) {
+
+  ActivityGoal requestActivityPlan(FitnessProfile profile) {
     final dailySteps = switch (profile.goal) {
       'lose_weight' => 10000,
       'maintain_weight' => 8000,
@@ -149,7 +151,7 @@ class HealthSyncController extends ChangeNotifier {
 
     final weeklyActiveMin = switch (profile.goal) {
       'lose_weight' => 250,
-      'maintain_weight' => 150,//all data fetched from world health orrganization 
+      'maintain_weight' => 150,
       'gain_weight' => 120,
       _ => 150,
     };
@@ -170,7 +172,7 @@ class HealthSyncController extends ChangeNotifier {
       _ => 0.18,
     };
 
-    final suggested = WeeklyGoal(
+    final suggested = ActivityGoal(
       targetSteps: dailySteps * 7,
       targetActiveMinutes: weeklyActiveMin,
       targetCaloriesBurned: profile.tdee * 7 * calMultiplier,
@@ -184,7 +186,7 @@ class HealthSyncController extends ChangeNotifier {
     return suggested;
   }
 
-  void confirmGoal(WeeklyGoal goal) {
+  void saveActivityPlan(ActivityGoal goal) {
     _weeklyGoal = goal;
     _suggestedGoal = null;
     notifyListeners();
@@ -194,6 +196,7 @@ class HealthSyncController extends ChangeNotifier {
     _weeklyGoal = null;
     notifyListeners();
   }
+
   static double _numericValue(HealthDataPoint point) {
     final v = point.value;
     if (v is NumericHealthValue) return v.numericValue.toDouble();

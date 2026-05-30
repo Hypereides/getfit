@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import '../../../core/state/session_controller.dart';
 import '../../coach_plans/state/coach_plan_controller.dart';
 
-class GetCoachScreen extends StatelessWidget {
-  const GetCoachScreen({super.key});
+class CoachListScreen extends StatelessWidget {
+  const CoachListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,4 @@
-//snapshot of health data
-class HealthSnapshot {
+class DailyProgress {
   final int steps;
   final int activeMinutes;
   final double caloriesBurned;
@@ -8,7 +7,7 @@ class HealthSnapshot {
   final DateTime fetchedAt;
   final bool isMockData;
 
-  const HealthSnapshot({
+  const DailyProgress({
     required this.steps,
     required this.activeMinutes,
     required this.caloriesBurned,

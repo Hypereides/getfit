@@ -235,7 +235,7 @@ class ProfileScreen extends StatelessWidget {
                             onPressed: () {
                               Navigator.of(context).push(
                                 MaterialPageRoute(
-                                  builder: (_) => const GetCoachScreen(),
+                                  builder: (_) => const CoachListScreen(),
                                 ),
                               );
                             },

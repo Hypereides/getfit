@@ -309,7 +309,7 @@ class _GetCoachCard extends StatelessWidget {
           'Browse coaches, view their profile, and request a personalised fitness plan.',
       onTap: () {
         Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => const GetCoachScreen()),
+          MaterialPageRoute(builder: (_) => const CoachListScreen()),
         );
       },
     );
@@ -382,6 +382,7 @@ class _WorkoutPlaceCard extends StatelessWidget {
     );
   }
 }
+
 class _DashboardShortcutCard extends StatelessWidget {
   const _DashboardShortcutCard({
     required this.gradient,

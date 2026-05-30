@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 
 import '../../../core/state/session_controller.dart';
 import '../../workouts/state/workout_controller.dart';
-import '../domain/weekly_goal.dart';
-import '../state/health_sync_controller.dart';
+import '../domain/activity_goal.dart';
+import '../state/google_fit_connector.dart';
 
 class HealthSyncScreen extends StatefulWidget {
   const HealthSyncScreen({super.key});
@@ -31,23 +31,23 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
     super.dispose();
   }
 
-  void _populateGoalForm(WeeklyGoal goal) {
+  void _populateGoalForm(ActivityGoal goal) {
     _stepsCtrl.text     = goal.targetSteps.toString();
     _activeMinCtrl.text = goal.targetActiveMinutes.toString();
     _caloriesCtrl.text  = goal.targetCaloriesBurned.toStringAsFixed(0);
     _workoutsCtrl.text  = goal.targetWorkouts.toString();
   }
 
-  void _onCreatePlan(HealthSyncController ctrl, dynamic profile) {
-    final suggestion = ctrl.generateSuggestion(profile);
+  void _requestActivityPlan(GoogleFitConnector ctrl, dynamic profile) {
+    final suggestion = ctrl.requestActivityPlan(profile);
     _populateGoalForm(suggestion);
     setState(() => _showGoalForm = true);
   }
 
-  void _confirmGoal(HealthSyncController ctrl) {
+  void _confirmActivityPlan(GoogleFitConnector ctrl) {
     if (!_goalFormKey.currentState!.validate()) return;
 
-    final goal = WeeklyGoal(
+    final goal = ActivityGoal(
       targetSteps:          int.parse(_stepsCtrl.text.trim()),
       targetActiveMinutes:  int.parse(_activeMinCtrl.text.trim()),
       targetCaloriesBurned: double.parse(_caloriesCtrl.text.trim()),
@@ -56,7 +56,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
       isSystemSuggested:    false,
     );
 
-    ctrl.confirmGoal(goal);
+    ctrl.saveActivityPlan(goal);
     setState(() => _showGoalForm = false);
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -76,7 +76,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ctrl    = context.watch<HealthSyncController>();
+    final ctrl    = context.watch<GoogleFitConnector>();
     final session = context.watch<SessionController>();
     final workouts = context.watch<WorkoutController>();
     final profile = session.currentUser?.profile;
@@ -102,7 +102,7 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _ConnectionCard(ctrl: ctrl),
+            _GoogleFitAuthScreen(ctrl: ctrl),
             const SizedBox(height: 24),
             if (ctrl.isConnected && ctrl.snapshot != null) ...[
               _HealthDataSection(snapshot: ctrl.snapshot!),
@@ -131,20 +131,20 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
             if (ctrl.isConnected && !_showGoalForm && ctrl.weeklyGoal == null) ...[
               _CreatePlanButton(
                 onTap: profile != null
-                    ? () => _onCreatePlan(ctrl, profile)
+                    ? () => _requestActivityPlan(ctrl, profile)
                     : null,
               ),
               const SizedBox(height: 24),
             ],
             if (_showGoalForm) ...[
-              _GoalSuggestionForm(
+              _ActivityPlanScreen(
                 formKey: _goalFormKey,
                 stepsCtrl: _stepsCtrl,
                 activeMinCtrl: _activeMinCtrl,
                 caloriesCtrl: _caloriesCtrl,
                 workoutsCtrl: _workoutsCtrl,
                 isSystemSuggested: ctrl.suggestedGoal?.isSystemSuggested ?? false,
-                onConfirm: () => _confirmGoal(ctrl),
+                onConfirm: () => _confirmActivityPlan(ctrl),
                 onCancel: () => setState(() => _showGoalForm = false),
               ),
             ],
@@ -155,9 +155,9 @@ class _HealthSyncScreenState extends State<HealthSyncScreen> {
   }
 }
 
-class _ConnectionCard extends StatelessWidget {
-  const _ConnectionCard({required this.ctrl});
-  final HealthSyncController ctrl;
+class _GoogleFitAuthScreen extends StatelessWidget {
+  const _GoogleFitAuthScreen({required this.ctrl});
+  final GoogleFitConnector ctrl;
 
   @override
   Widget build(BuildContext context) {
@@ -280,7 +280,7 @@ class _ConnectionCard extends StatelessWidget {
                 ),
                 onPressed: status == FitConnectionStatus.connecting
                     ? null
-                    : ctrl.connect,
+                    : ctrl.requestConnection,
                 icon: status == FitConnectionStatus.connecting
                     ? const SizedBox(
                         width: 18,
@@ -409,7 +409,6 @@ class _HealthDataSection extends StatelessWidget {
   }
 }
 
-
 class _DailyProgressCard extends StatelessWidget {
   const _DailyProgressCard(
       {required this.snapshot,
@@ -528,8 +527,8 @@ class _CreatePlanButton extends StatelessWidget {
   }
 }
 
-class _GoalSuggestionForm extends StatelessWidget {
-  const _GoalSuggestionForm({
+class _ActivityPlanScreen extends StatelessWidget {
+  const _ActivityPlanScreen({
     required this.formKey,
     required this.stepsCtrl,
     required this.activeMinCtrl,
@@ -566,8 +565,7 @@ class _GoalSuggestionForm extends StatelessWidget {
         ),
         focusedBorder: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
-          borderSide:
-              BorderSide(color: Color(0xFF2E7D32), width: 2),
+          borderSide: BorderSide(color: Color(0xFF2E7D32), width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -692,7 +690,7 @@ class _GoalSuggestionForm extends StatelessWidget {
                   onPressed: onConfirm,
                   icon: const Icon(Icons.check_rounded),
                   label: const Text(
-                    'Confirm Goal',
+                    'Confirm Plan',
                     style: TextStyle(fontWeight: FontWeight.w700),
                   ),
                 ),
@@ -745,7 +743,7 @@ class _SavedGoalCard extends StatelessWidget {
     required this.onClear,
   });
 
-  final WeeklyGoal goal;
+  final ActivityGoal goal;
   final dynamic workouts;
   final dynamic snapshot;
   final VoidCallback onEdit;
@@ -881,7 +879,6 @@ class _GoalProgressRow extends StatelessWidget {
       v >= 1000 ? '${(v / 1000).toStringAsFixed(1)}k' : v.toStringAsFixed(0);
 }
 
-
 class _Card extends StatelessWidget {
   const _Card({
     required this.title,
@@ -952,7 +949,6 @@ class _Card extends StatelessWidget {
     );
   }
 }
-
 
 class _MetricTile extends StatelessWidget {
   const _MetricTile({

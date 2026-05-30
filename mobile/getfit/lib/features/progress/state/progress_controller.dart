@@ -6,18 +6,17 @@ class ProgressController extends ChangeNotifier {
 
   List<ProgressEntry> get entries => List.unmodifiable(_entries);
 
-
-  List<ProgressEntry> get sortedEntries {
+  List<ProgressEntry> get measurementHistory {
     final copy = [..._entries];
     copy.sort((a, b) => a.date.compareTo(b.date));
     return copy;
   }
 
   double? get initialWeight =>
-      sortedEntries.isEmpty ? null : sortedEntries.first.weightKg;
+      measurementHistory.isEmpty ? null : measurementHistory.first.weightKg;
 
   double? get currentWeight =>
-      sortedEntries.isEmpty ? null : sortedEntries.last.weightKg;
+      measurementHistory.isEmpty ? null : measurementHistory.last.weightKg;
 
   double? get weightChange {
     final i = initialWeight;
@@ -28,11 +27,11 @@ class ProgressController extends ChangeNotifier {
 
   double? get currentBodyFat {
     final withFat =
-        sortedEntries.where((e) => e.bodyFatPercent != null).toList();
+        measurementHistory.where((e) => e.bodyFatPercent != null).toList();
     return withFat.isEmpty ? null : withFat.last.bodyFatPercent;
   }
 
-  int get streak {
+  int get trackingStreak {
     if (_entries.isEmpty) return 0;
 
     final now = DateTime.now();
@@ -59,13 +58,13 @@ class ProgressController extends ChangeNotifier {
   }
 
   double? get dailyTrend {
-    final s = sortedEntries;
+    final s = measurementHistory;
     if (s.length < 2) return null;
     return s.last.weightKg - s[s.length - 2].weightKg;
   }
 
   double? get weeklyTrend {
-    final s = sortedEntries;
+    final s = measurementHistory;
     if (s.isEmpty) return null;
 
     final now = DateTime.now();
@@ -86,7 +85,7 @@ class ProgressController extends ChangeNotifier {
     return null;
   }
 
-  void addEntry(ProgressEntry entry) {
+  void saveMeasurement(ProgressEntry entry) {
     _entries.add(entry);
     notifyListeners();
   }

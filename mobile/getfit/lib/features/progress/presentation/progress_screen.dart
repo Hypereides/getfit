@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../../core/state/session_controller.dart';
 import '../../health_sync/presentation/health_sync_screen.dart';
-import '../../health_sync/state/health_sync_controller.dart';
+import '../../health_sync/state/google_fit_connector.dart';
 import '../../workouts/state/workout_controller.dart';
 import '../domain/progress_entry.dart';
 import '../state/progress_controller.dart';
@@ -28,7 +28,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
     super.dispose();
   }
 
-  void _submitEntry(ProgressController progress) {
+  void _submitMeasurement(ProgressController progress) {
     if (!_formKey.currentState!.validate()) return;
 
     final weight = double.parse(_weightCtrl.text.trim());
@@ -36,7 +36,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
         ? null
         : double.tryParse(_fatCtrl.text.trim());
 
-    progress.addEntry(
+    progress.saveMeasurement(
       ProgressEntry(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         date: DateTime.now(),
@@ -225,9 +225,9 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 _IndicatorTile(
                   icon: Icons.calendar_today_rounded,
                   label: 'Tracking Streak',
-                  value: '${progress.streak} day${progress.streak == 1 ? '' : 's'}',
-                  sub: progress.streak > 0 ? 'keep it up!' : 'log today to start',
-                  iconColor: progress.streak > 0 ? Colors.amber[700]! : Colors.grey,
+                  value: '${progress.trackingStreak} day${progress.trackingStreak == 1 ? '' : 's'}',
+                  sub: progress.trackingStreak > 0 ? 'keep it up!' : 'log today to start',
+                  iconColor: progress.trackingStreak > 0 ? Colors.amber[700]! : Colors.grey,
                 ),
               ],
             ),
@@ -243,7 +243,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
             ),
             const SizedBox(height: 24),
 
-            progress.entries.length < 2
+            progress.measurementHistory.length < 2
                 ? _emptyTrendCard()
                 : Wrap(
                     spacing: 24,
@@ -287,11 +287,11 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
             if (_showForm) ...[
               const SizedBox(height: 24),
-              _LogForm(
+              _MeasurementFormScreen(
                 formKey: _formKey,
                 weightCtrl: _weightCtrl,
                 fatCtrl: _fatCtrl,
-                onSubmit: () => _submitEntry(progress),
+                onSubmit: () => _submitMeasurement(progress),
                 onCancel: () {
                   _weightCtrl.clear();
                   _fatCtrl.clear();
@@ -299,13 +299,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
                 },
               ),
             ],
-            if (progress.sortedEntries.isNotEmpty) ...[
+
+            if (progress.measurementHistory.isNotEmpty) ...[
               const SizedBox(height: 48),
               Divider(color: Colors.grey[200]),
               const SizedBox(height: 40),
               _sectionTitle('Measurement History'),
               const SizedBox(height: 16),
-              ...progress.sortedEntries.reversed.take(10).map(
+              ...progress.measurementHistory.reversed.take(10).map(
                     (entry) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: _HistoryRow(
@@ -366,8 +367,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
 }
 
 
-class _LogForm extends StatelessWidget {
-  const _LogForm({
+class _MeasurementFormScreen extends StatelessWidget {
+  const _MeasurementFormScreen({
     required this.formKey,
     required this.weightCtrl,
     required this.fatCtrl,
@@ -749,7 +750,7 @@ class _HistoryRow extends StatelessWidget {
 class _GoogleFitBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    final ctrl = context.watch<HealthSyncController>();
+    final ctrl = context.watch<GoogleFitConnector>();
     final isConnected = ctrl.isConnected;
     final snapshot = ctrl.snapshot;
 
