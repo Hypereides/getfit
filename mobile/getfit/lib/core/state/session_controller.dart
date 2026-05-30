@@ -33,16 +33,11 @@ class SessionController extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final user = await _authService.login(
-        email: email,
-        password: password,
-      );
-
+      final user = await _authService.login(email: email, password: password);
       _currentUser = user;
       _coaches = _authService.getCoaches();
       _isLoading = false;
       notifyListeners();
-
       return user != null;
     } catch (e) {
       _errorMessage = 'Login failed.';
@@ -55,6 +50,8 @@ class SessionController extends ChangeNotifier {
   Future<void> register({
     required String email,
     required String password,
+    required String username,
+    required bool premiumEnabled,
     required FitnessProfile profile,
   }) async {
     _isLoading = true;
@@ -65,9 +62,10 @@ class SessionController extends ChangeNotifier {
       final user = await _authService.register(
         email: email,
         password: password,
+        username: username,
+        premiumEnabled: premiumEnabled,
         profile: profile,
       );
-
       _currentUser = user;
       _coaches = _authService.getCoaches();
       _isLoading = false;
@@ -88,12 +86,10 @@ class SessionController extends ChangeNotifier {
 
   void togglePremium(bool enabled) {
     if (_currentUser == null) return;
-
     final updatedUser = _currentUser!.copyWith(
       premiumEnabled: enabled,
       selectedCoachId: enabled ? _currentUser!.selectedCoachId : null,
     );
-
     _currentUser = _authService.updateUser(updatedUser);
     _coaches = _authService.getCoaches();
     notifyListeners();
@@ -101,11 +97,7 @@ class SessionController extends ChangeNotifier {
 
   void selectCoach(String coachId) {
     if (_currentUser == null) return;
-
-    final updatedUser = _currentUser!.copyWith(
-      selectedCoachId: coachId,
-    );
-
+    final updatedUser = _currentUser!.copyWith(selectedCoachId: coachId);
     _currentUser = _authService.updateUser(updatedUser);
     _coaches = _authService.getCoaches();
     notifyListeners();
@@ -113,9 +105,7 @@ class SessionController extends ChangeNotifier {
 
   void updateProfile(FitnessProfile profile) {
     if (_currentUser == null) return;
-
     final updatedUser = _currentUser!.copyWith(profile: profile);
-
     _currentUser = _authService.updateUser(updatedUser);
     _coaches = _authService.getCoaches();
     notifyListeners();
