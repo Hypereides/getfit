@@ -34,7 +34,7 @@ class WorkoutPlace {
     return hour >= openingHour || hour < closingHour;
   }
 
-  String get hoursLabel {
+  String get availableHours {
     String fmt(int h) => '${h.toString().padLeft(2, '0')}:00';
     if (closingHour > openingHour) {
       return '${fmt(openingHour)} – ${fmt(closingHour)}';

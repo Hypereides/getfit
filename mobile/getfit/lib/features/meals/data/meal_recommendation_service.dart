@@ -2,7 +2,7 @@ import '../domain/meal_ingredient.dart';
 import '../domain/meal_recommendation.dart';
 
 class MealRecommendationService {
-  Future<List<MealRecommendation>> getRecommendations({
+  Future<List<MealRecommendation>> getMealsWithConstraints({
     required String city,
     required String goal,
     required double remainingCalories,

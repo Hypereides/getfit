@@ -49,16 +49,17 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
     final targetCal = profile?.targetDailyCalories ?? 2000;
     final todayCal = foodLog.todayCalories;
     final todayProt = foodLog.todayProtein;
-
     final targetProt = ((profile?.tdee ?? 2000) * 0.25 / 4);
 
     setState(() => _isLoading = true);
-    final meals = await _service.getRecommendations(
+
+    final meals = await _service.getMealsWithConstraints(
       city: profile?.city ?? 'Athens',
       goal: profile?.goal ?? 'maintain_weight',
       remainingCalories: (targetCal - todayCal).clamp(0, 5000),
       remainingProtein: (targetProt - todayProt).clamp(0, 300),
     );
+
     if (!mounted) return;
     setState(() {
       _meals = meals;
@@ -66,12 +67,12 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
     });
   }
 
-  void _showMealDetail(MealRecommendation meal) {
+  void _showMealInfo(MealRecommendation meal) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _MealDetailSheet(
+      builder: (_) => _MealInfoScreen(
         meal: meal,
         onConfirm: () {
           Navigator.pop(context);
@@ -81,10 +82,12 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
       ),
     );
   }
+
   void _onConfirmMeal(MealRecommendation meal) {
     final myMeals = context.read<MyMealsController>();
     final shopping = context.read<ShoppingListController>();
     final foodLog = context.read<FoodLogController>();
+
     final mealProduct = FoodProduct(
       barcode: 'meal_rec_${meal.id}',
       name: meal.title,
@@ -95,15 +98,18 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
       fatsPer100g: meal.fatsGrams.toDouble(),
       typicalServingG: 100,
     );
+
     foodLog.logFood(product: mealProduct, quantityG: 100);
-    shopping.addFromIngredients(meal.ingredients);
-    myMeals.saveMeal(meal);
+
+    shopping.addIngredients(meal.ingredients);
+
+    myMeals.addMeal(meal);
 
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _ShoppingListSheet(
+      builder: (_) => _ShoppingListScreen(
         onDone: () => Navigator.pop(context),
       ),
     );
@@ -273,7 +279,7 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
                 width: cardWidth,
                 child: _MealCard(
                   meal: m,
-                  onTap: () => _showMealDetail(m),
+                  onTap: () => _showMealInfo(m),
                 ),
               )).toList(),
             ),
@@ -332,8 +338,8 @@ class _MealRecommendationScreenState extends State<MealRecommendationScreen> {
 }
 
 
-class _MealDetailSheet extends StatelessWidget {
-  const _MealDetailSheet({required this.meal, required this.onConfirm, required this.onDismiss});
+class _MealInfoScreen extends StatelessWidget {
+  const _MealInfoScreen({required this.meal, required this.onConfirm, required this.onDismiss});
   final MealRecommendation meal;
   final VoidCallback onConfirm;
   final VoidCallback onDismiss;
@@ -394,10 +400,10 @@ class _MealDetailSheet extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFA5D6A7)),
               ),
-              child: Row(children: [
-                const Icon(Icons.info_outline_rounded, color: Color(0xFF2E7D32), size: 16),
-                const SizedBox(width: 8),
-                const Expanded(
+              child: const Row(children: [
+                Icon(Icons.info_outline_rounded, color: Color(0xFF2E7D32), size: 16),
+                SizedBox(width: 8),
+                Expanded(
                   child: Text(
                     'Adding this meal will log it to your daily food diary and update your remaining calories.',
                     style: TextStyle(fontSize: 12, color: Color(0xFF2E7D32), height: 1.4),
@@ -450,8 +456,8 @@ Widget _macroChip(String label, String value, Color color) => Container(
 );
 
 
-class _ShoppingListSheet extends StatelessWidget {
-  const _ShoppingListSheet({required this.onDone});
+class _ShoppingListScreen extends StatelessWidget {
+  const _ShoppingListScreen({required this.onDone});
   final VoidCallback onDone;
 
   @override
@@ -553,6 +559,7 @@ class _ShoppingListSheet extends StatelessWidget {
     );
   }
 }
+
 class _StoreMealCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

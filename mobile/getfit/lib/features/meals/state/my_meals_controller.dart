@@ -9,7 +9,7 @@ class MyMealsController extends ChangeNotifier {
 
   bool isSaved(String mealId) => _meals.any((m) => m.meal.id == mealId);
 
-  void saveMeal(MealRecommendation meal) {
+  void addMeal(MealRecommendation meal) {
     if (isSaved(meal.id)) return;
     _meals.insert(0, MyMeal(
       id: DateTime.now().millisecondsSinceEpoch.toString(),

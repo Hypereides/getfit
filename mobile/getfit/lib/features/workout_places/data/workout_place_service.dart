@@ -2,7 +2,9 @@ import '../../../core/data/country_city_data.dart';
 import '../domain/workout_place.dart';
 
 class WorkoutPlaceService {
-  Future<WorkoutPlaceResult> searchPlaces({required String city}) async {
+  Future<WorkoutPlaceResult> getWorkoutPlacesWithinDistanceFromLocation({
+    required String city,
+  }) async {
     await Future.delayed(const Duration(milliseconds: 900));
 
     final userLat = CountryCityData.latitudeFor(city);

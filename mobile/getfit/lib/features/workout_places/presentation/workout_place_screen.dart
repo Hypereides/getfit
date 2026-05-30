@@ -33,7 +33,7 @@ class _WorkoutPlaceScreenState extends State<WorkoutPlaceScreen> {
     final city = context.read<SessionController>().currentUser?.profile.city ?? 'Athens';
     _mockCity = city;
 
-    final result = await _service.searchPlaces(city: city);
+    final result = await _service.getWorkoutPlacesWithinDistanceFromLocation(city: city);
     if (!mounted) return;
 
     setState(() {
@@ -44,11 +44,11 @@ class _WorkoutPlaceScreenState extends State<WorkoutPlaceScreen> {
     if (result.open.isEmpty) {
       await Future.delayed(const Duration(milliseconds: 200));
       if (!mounted) return;
-      _showNoPlacesDialog();
+      _showNoAvailableWorkoutPlacesMessage();
     }
   }
 
-  void _showNoPlacesDialog() {
+  void _showNoAvailableWorkoutPlacesMessage() {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -76,23 +76,23 @@ class _WorkoutPlaceScreenState extends State<WorkoutPlaceScreen> {
     );
   }
 
-  void _showPlaceDetail(WorkoutPlace place) {
+  void _showWorkoutPlaceInfo(WorkoutPlace place) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _PlaceDetailSheet(
+      builder: (_) => _WorkoutPlaceInfoSheet(
         place: place,
         onDirections: () {
           Navigator.pop(context);
-          _openDirections(place);
+          openDirections(place);
         },
         onCancel: () => Navigator.pop(context),
       ),
     );
   }
 
-  Future<void> _openDirections(WorkoutPlace place) async {
+  Future<void> openDirections(WorkoutPlace place) async {
     final uri = Uri.parse(
       'https://www.google.com/maps/dir/?api=1&destination=${place.latitude},${place.longitude}&travelmode=walking',
     );
@@ -194,7 +194,11 @@ class _WorkoutPlaceScreenState extends State<WorkoutPlaceScreen> {
             else
               ...(_result!.open.map((p) => Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: _PlaceCard(place: p, isOpen: true, onTap: () => _showPlaceDetail(p)),
+                child: _PlaceCard(
+                  place: p,
+                  isOpen: true,
+                  onTap: () => _showWorkoutPlaceInfo(p),
+                ),
               ))),
 
             if (_result!.closed.isNotEmpty) ...[
@@ -228,7 +232,11 @@ class _WorkoutPlaceScreenState extends State<WorkoutPlaceScreen> {
                 const SizedBox(height: 12),
                 ...(_result!.closed.map((p) => Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: _PlaceCard(place: p, isOpen: false, onTap: () => _showPlaceDetail(p)),
+                  child: _PlaceCard(
+                    place: p,
+                    isOpen: false,
+                    onTap: () => _showWorkoutPlaceInfo(p),
+                  ),
                 ))),
               ],
             ],
@@ -311,7 +319,7 @@ class _PlaceCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(place.hoursLabel, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+                Text(place.availableHours, style: TextStyle(fontSize: 11, color: Colors.grey[500])),
               ]),
             ]),
             const SizedBox(height: 12),
@@ -344,11 +352,15 @@ class _PlaceCard extends StatelessWidget {
 }
 
 
-class _PlaceDetailSheet extends StatelessWidget {
-  const _PlaceDetailSheet({required this.place, required this.onDirections, required this.onCancel});
+class _WorkoutPlaceInfoSheet extends StatelessWidget {
+  const _WorkoutPlaceInfoSheet({
+    required this.place,
+    required this.onDirections,
+    required this.onCancel,
+  });
   final WorkoutPlace place;
   final VoidCallback onDirections;
-  final VoidCallback onCancel; //flow 2 alter*
+  final VoidCallback onCancel;
 
   @override
   Widget build(BuildContext context) {
@@ -391,7 +403,7 @@ class _PlaceDetailSheet extends StatelessWidget {
             const SizedBox(height: 20),
 
             _infoTile(Icons.location_on_outlined, 'Address', place.address),
-            _infoTile(Icons.access_time_rounded, 'Hours', place.hoursLabel),
+            _infoTile(Icons.access_time_rounded, 'Hours', place.availableHours),
             _infoTile(Icons.star_rounded, 'Rating', '${place.rating} / 5.0'),
             if (place.phone.isNotEmpty)
               _infoTile(Icons.phone_outlined, 'Phone', place.phone),

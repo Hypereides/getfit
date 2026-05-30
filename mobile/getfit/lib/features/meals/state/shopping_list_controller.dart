@@ -8,7 +8,7 @@ class ShoppingListController extends ChangeNotifier {
   List<ShoppingListItem> get items => List.unmodifiable(_items);
   bool get isEmpty => _items.isEmpty;
 
-  void addFromIngredients(List<MealIngredient> ingredients) {
+  void addIngredients(List<MealIngredient> ingredients) {
     for (final ing in ingredients) {
       final existing = _items.indexWhere(
           (i) => i.name.toLowerCase() == ing.name.toLowerCase() && i.unit == ing.unit);
