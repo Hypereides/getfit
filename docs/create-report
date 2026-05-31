@@ -28,6 +28,11 @@ pandoc sequence-diagrams.md -o out.pdf "${args[@]}"
 mv out.pdf ../exports/out.pdf
 cd ../../
 
+cd domain-model/src/
+pandoc domain-model.md -o out.pdf "${args[@]}"
+mv out.pdf ../exports/out.pdf
+cd ../../
+
 cd class-diagram/
 pandoc class-diagram.md -o out.pdf "${args[@]}"
 cd ../
@@ -38,5 +43,6 @@ pdfunite \
     robustness-diagrams/exports/out.pdf \
     sequence-diagrams/exports/out.pdf \
     class-diagram/out.pdf \
+    domain-model/exports/out.pdf \
     project-description/src/test-cases/getfit.pdf \
     report.pdf \
