@@ -3,15 +3,16 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/services.dart' show MissingPluginException;
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import '../domain/location.dart';
 import '../domain/workout_place.dart';
 
 class WorkoutPlaceService {
   static const String _overpassUrl =
       'https://overpass-api.de/api/interpreter';
   static const int _radiusMeters = 3000;
-
   Future<WorkoutPlaceResult> getWorkoutPlacesWithinDistanceFromLocation() async {
-    final (lat, lng) = await _getCurrentLocation();
+    final location = await _getCurrentLocation();
+    final (lat, lng) = location.getCoordinates();
     final places = await _fetchNearbyWorkoutPlaces(lat, lng);
 
     return WorkoutPlaceResult(
@@ -25,7 +26,7 @@ class WorkoutPlaceService {
 
   Future<WorkoutPlace> fetchPlaceDetails(WorkoutPlace place) async => place;
 
-  Future<(double, double)> _getCurrentLocation() async {
+  Future<Location> _getCurrentLocation() async {
     try {
       if (!kIsWeb) {
         final serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -49,7 +50,10 @@ class WorkoutPlaceService {
           timeLimit: Duration(seconds: 15),
         ),
       );
-      return (pos.latitude, pos.longitude);
+
+      final location = Location();
+      location.setCoordinates(pos.latitude, pos.longitude);
+      return location;
 
     } on LocationServiceDisabledException {
       rethrow;
@@ -85,13 +89,10 @@ out center tags;
     final uri = Uri.parse(_overpassUrl)
         .replace(queryParameters: {'data': query});
 
-    final response = await http.get(
-      uri,
-      headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'GetFitApp/1.0 (Flutter)',
-      },
-    ).timeout(const Duration(seconds: 35));
+    final response = await http.get(uri, headers: {
+      'Accept': 'application/json',
+      'User-Agent': 'GetFitApp/1.0 (Flutter)',
+    }).timeout(const Duration(seconds: 35));
 
     if (response.statusCode != 200) {
       throw PlacesApiException('HTTP ${response.statusCode}');
@@ -172,7 +173,6 @@ out center tags;
 
   bool? _isCurrentlyOpen(String? hoursStr) {
     if (hoursStr == null || hoursStr.trim().isEmpty) return null;
-
     final s = hoursStr.trim().toLowerCase();
     if (s == '24/7')   return true;
     if (s == 'closed') return false;
@@ -184,17 +184,13 @@ out center tags;
     for (final rule in s.split(';')) {
       final r = rule.trim();
       if (r.isEmpty) continue;
-
       final timeRx = RegExp(r'(\d{1,2}:\d{2})-(\d{1,2}:\d{2})');
       final tm = timeRx.firstMatch(r);
       if (tm == null) continue;
-
       final openMin  = _toMinutes(tm.group(1)!);
       var   closeMin = _toMinutes(tm.group(2)!);
       if (closeMin == 0) closeMin = 24 * 60;
-
-      final dayPart = r.substring(0, tm.start).trim();
-      if (_dayApplies(dayPart, todayIdx)) {
+      if (_dayApplies(r.substring(0, tm.start).trim(), todayIdx)) {
         return nowMin >= openMin && nowMin < closeMin;
       }
     }
@@ -204,9 +200,7 @@ out center tags;
   bool _dayApplies(String dayPart, int todayIdx) {
     if (dayPart.isEmpty) return true;
     const abbr = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
-
-    final rangeRx = RegExp(r'^([a-z]{2})-([a-z]{2})$');
-    final rm = rangeRx.firstMatch(dayPart);
+    final rm = RegExp(r'^([a-z]{2})-([a-z]{2})$').firstMatch(dayPart);
     if (rm != null) {
       final from = abbr.indexOf(rm.group(1)!);
       final to   = abbr.indexOf(rm.group(2)!);
@@ -215,10 +209,7 @@ out center tags;
         return todayIdx >= from || todayIdx <= to;
       }
     }
-
-    return dayPart
-        .split(',')
-        .map((d) => d.trim())
+    return dayPart.split(',').map((d) => d.trim())
         .any((d) => abbr.indexOf(d) == todayIdx);
   }
 
