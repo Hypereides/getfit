@@ -1,0 +1,145 @@
+<diagram program="umletino" version="15.1"><zoom_level>9</zoom_level><element><id>UMLActor</id><coordinates><x>414</x><y>198</y><w>54</w><h>99</h></coordinates><panel_attributes>User</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>441</x><y>252</y><w>126</w><h>378</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>120;400;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>774</x><y>414</y><w>171</w><h>72</h></coordinates><panel_attributes>ανάκτηση δεδομένων GoogleFit
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>666</x><y>207</y><w>90</w><h>72</h></coordinates><panel_attributes>Αρχική Οθόνη 
+customelement=
+// Boundary Symbol
+drawCircle(50, 50, 20)
+drawLine(20, 50, 30, 50)
+drawLine(20, 30, 20, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>864</x><y>216</y><w>135</w><h>72</h></coordinates><panel_attributes>έλεγχος εξουσιοδότησης 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLActor</id><coordinates><x>1521</x><y>243</y><w>72</w><h>99</h></coordinates><panel_attributes>GoogleFit</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>1278</x><y>225</y><w>90</w><h>72</h></coordinates><panel_attributes>
+customelement=
+// Boundary Symbol
+drawCircle(50, 50, 20)
+drawLine(20, 50, 30, 50)
+drawLine(20, 30, 20, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>1269</x><y>324</y><w>90</w><h>72</h></coordinates><panel_attributes>
+customelement=
+// Boundary Symbol
+drawCircle(50, 50, 20)
+drawLine(20, 50, 30, 50)
+drawLine(20, 30, 20, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1332</x><y>270</y><w>225</w><h>45</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;230;30</additional_attributes></element><element><id>Relation</id><coordinates><x>1323</x><y>297</y><w>234</w><h>99</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;90;240;10</additional_attributes></element><element><id>Relation</id><coordinates><x>441</x><y>243</y><w>261</w><h>27</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>270;10;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>477</x><y>450</y><w>162</w><h>63</h></coordinates><panel_attributes>επιλέγει "Δημιουργία Πλάνου"</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>513</x><y>234</y><w>99</w><h>63</h></coordinates><panel_attributes>επιλέγει σύνδεση </panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>720</x><y>243</y><w>189</w><h>36</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>190;20;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>918</x><y>252</y><w>396</w><h>36</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;420;20</additional_attributes></element><element><id>Relation</id><coordinates><x>684</x><y>261</y><w>234</w><h>117</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;110;240;10</additional_attributes></element><element><id>Relation</id><coordinates><x>909</x><y>261</y><w>144</w><h>252</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>140;260;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>792</x><y>288</y><w>99</w><h>63</h></coordinates><panel_attributes>ΝΑΙ</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>945</x><y>306</y><w>99</w><h>63</h></coordinates><panel_attributes>ΟΧΙ </panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>999</x><y>459</y><w>207</w><h>72</h></coordinates><panel_attributes>Εμφάνιση αδυναμίας εξουσιοδότησης 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>1071</x><y>81</y><w>108</w><h>72</h></coordinates><panel_attributes>Οθόνη σφάλματος 
+customelement=
+// Boundary Symbol
+drawCircle(50, 50, 20)
+drawLine(20, 50, 30, 50)
+drawLine(20, 30, 20, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>846</x><y>594</y><w>135</w><h>72</h></coordinates><panel_attributes>εμφάνιση δεδομένων 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>873</x><y>45</y><w>234</w><h>99</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;240;90</additional_attributes></element><element><id>Relation</id><coordinates><x>1044</x><y>126</y><w>90</w><h>387</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>80;10;10;410</additional_attributes></element><element><id>Relation</id><coordinates><x>441</x><y>117</y><w>666</w><h>117</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>720;10;10;110</additional_attributes></element><element><id>Text</id><coordinates><x>567</x><y>162</y><w>99</w><h>63</h></coordinates><panel_attributes>επιλέγει "οκ"</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>702</x><y>36</y><w>171</w><h>216</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;220;170;10</additional_attributes></element><element><id>Text</id><coordinates><x>630</x><y>315</y><w>126</w><h>72</h></coordinates><panel_attributes>Οθόνη εξουσιοδότησης 
+customelement=
+// Boundary Symbol
+drawCircle(50, 50, 20)
+drawLine(20, 50, 30, 50)
+drawLine(20, 30, 20, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>828</x><y>360</y><w>477</w><h>117</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;110;510;10</additional_attributes></element><element><id>Relation</id><coordinates><x>675</x><y>360</y><w>144</w><h>117</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>140;110;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>657</x><y>540</y><w>171</w><h>72</h></coordinates><panel_attributes>αντιστοίχιση δεδομένων
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>702</x><y>459</y><w>126</w><h>135</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;130;120;10</additional_attributes></element><element><id>Text</id><coordinates><x>828</x><y>0</y><w>135</w><h>72</h></coordinates><panel_attributes>επιστροφή στην Αρχική 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>711</x><y>585</y><w>189</w><h>72</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>190;60;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>1008</x><y>639</y><w>171</w><h>72</h></coordinates><panel_attributes>ενημέρωση ημερήσιας προόδου 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>900</x><y>639</y><w>153</w><h>63</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>150;50;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>1251</x><y>648</y><w>81</w><h>72</h></coordinates><panel_attributes>DailyProgress
+customelement=
+// Entity Symbol
+drawCircle(50, 50, 20)
+drawLine(30, 70, 70, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1062</x><y>675</y><w>234</w><h>36</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>240;20;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>513</x><y>576</y><w>126</w><h>72</h></coordinates><panel_attributes>Οθόνη δεδομένων 
+customelement=
+// Boundary Symbol
+drawCircle(50, 50, 20)
+drawLine(20, 50, 30, 50)
+drawLine(20, 30, 20, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>567</x><y>576</y><w>135</w><h>63</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;50;130;10</additional_attributes></element><element><id>Text</id><coordinates><x>675</x><y>702</y><w>171</w><h>72</h></coordinates><panel_attributes>δημιουργία πρότασης 
+               εβδομαδιαίου στόχου 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>558</x><y>621</y><w>162</w><h>135</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>160;130;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>918</x><y>729</y><w>81</w><h>72</h></coordinates><panel_attributes>DailyProgress
+customelement=
+// Entity Symbol
+drawCircle(50, 50, 20)
+drawLine(30, 70, 70, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>729</x><y>738</y><w>234</w><h>54</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>240;40;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>495</x><y>729</y><w>171</w><h>72</h></coordinates><panel_attributes>εμφάνιση πρότασης 
+               εβδομαδιαίου στόχου 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>540</x><y>738</y><w>189</w><h>54</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;40;190;10</additional_attributes></element><element><id>Text</id><coordinates><x>342</x><y>738</y><w>144</w><h>72</h></coordinates><panel_attributes>Οθόνη επιβεβαίωσης 
+        εβδομαδιαίου στόχου 
+customelement=
+// Boundary Symbol
+drawCircle(50, 50, 20)
+drawLine(20, 50, 30, 50)
+drawLine(20, 30, 20, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>387</x><y>765</y><w>153</w><h>45</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;30;150;10</additional_attributes></element><element><id>Relation</id><coordinates><x>369</x><y>243</y><w>99</w><h>549</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;590;90;10</additional_attributes></element><element><id>Text</id><coordinates><x>369</x><y>540</y><w>162</w><h>63</h></coordinates><panel_attributes>επιλογή Χρήστη </panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>621</x><y>855</y><w>171</w><h>72</h></coordinates><panel_attributes>επιβεβαίωση 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>675</x><y>900</y><w>189</w><h>81</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>190;70;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>387</x><y>783</y><w>288</w><h>135</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>300;130;10;10</additional_attributes></element><element><id>Text</id><coordinates><x>720</x><y>900</y><w>162</w><h>63</h></coordinates><panel_attributes>ΝΑΙ </panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>819</x><y>909</y><w>189</w><h>72</h></coordinates><panel_attributes>Αποθήκευση εβδομαδιαίου πλάνου  
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>1053</x><y>936</y><w>81</w><h>72</h></coordinates><panel_attributes>ActivityGoal
+customelement=
+// Entity Symbol
+drawCircle(50, 50, 20)
+drawLine(30, 70, 70, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>873</x><y>945</y><w>234</w><h>54</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>240;40;10;10</additional_attributes></element><element><id>Relation</id><coordinates><x>495</x><y>900</y><w>180</w><h>99</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;90;180;10</additional_attributes></element><element><id>Text</id><coordinates><x>567</x><y>918</y><w>162</w><h>63</h></coordinates><panel_attributes>OXI </panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>441</x><y>936</y><w>207</w><h>72</h></coordinates><panel_attributes>Εμφάνιση μηνύματος απόρριψης 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>189</x><y>891</y><w>144</w><h>72</h></coordinates><panel_attributes>Οθόνη αποτυχίας 
+customelement=
+// Boundary Symbol
+drawCircle(50, 50, 20)
+drawLine(20, 50, 30, 50)
+drawLine(20, 30, 20, 70)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>234</x><y>936</y><w>252</w><h>63</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;260;50</additional_attributes></element><element><id>Relation</id><coordinates><x>198</x><y>252</y><w>243</w><h>693</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;750;250;10</additional_attributes></element><element><id>Text</id><coordinates><x>207</x><y>792</y><w>99</w><h>63</h></coordinates><panel_attributes>επιλέγει "οκ"</panel_attributes><additional_attributes></additional_attributes></element><element><id>Text</id><coordinates><x>0</x><y>774</y><w>171</w><h>72</h></coordinates><panel_attributes>επιστροφή στην Αρχική Οθόνη 
+customelement=
+// Control Symbol
+drawCircle(50, 50, 20)
+drawLine(44, 31, 54, 21)
+drawLine(44, 31, 54, 41)
+	</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>45</x><y>819</y><w>198</w><h>144</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>10;10;200;140</additional_attributes></element><element><id>Relation</id><coordinates><x>45</x><y>252</y><w>675</w><h>567</h></coordinates><panel_attributes>lt=&lt;-</panel_attributes><additional_attributes>730;10;10;610</additional_attributes></element></diagram>
