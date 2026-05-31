@@ -74,7 +74,6 @@ class CoachListScreen extends StatelessWidget {
                     ),
                   ),
                 ],
-
                 const SizedBox(height: 32),
                 if (coaches.isEmpty)
                   Center(
@@ -156,9 +155,13 @@ class _CoachCard extends StatelessWidget {
         ),
         title: Row(
           children: [
-            Text(
-              coach.profile.name,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            Flexible(
+              child: Text(
+                coach.profile.name,
+                style: const TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             if (isCurrentCoach) ...[
               const SizedBox(width: 8),
@@ -201,15 +204,18 @@ class _CoachCard extends StatelessWidget {
               )
             : ElevatedButton(
                 onPressed: () {
-                  final session =
-                      Provider.of<SessionController>(context, listen: false);
+                  final session = Provider.of<SessionController>(
+                      context,
+                      listen: false);
                   final coachPlanController =
-                      Provider.of<CoachPlanController>(context, listen: false);
+                      Provider.of<CoachPlanController>(context,
+                          listen: false);
                   final currentUser = session.currentUser;
 
                   if (currentUser == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please log in first')),
+                      const SnackBar(
+                          content: Text('Please log in first')),
                     );
                     return;
                   }
@@ -234,9 +240,12 @@ class _CoachCard extends StatelessWidget {
                           const Icon(Icons.check_circle_outline,
                               color: Colors.white),
                           const SizedBox(width: 10),
-                          Text(
-                            'Request sent to ${coach.profile.name}!',
-                            style: const TextStyle(color: Colors.white),
+                          Expanded(
+                            child: Text(
+                              'Request sent to ${coach.profile.name}!',
+                              style:
+                                  const TextStyle(color: Colors.white),
+                            ),
                           ),
                         ],
                       ),
@@ -248,13 +257,10 @@ class _CoachCard extends StatelessWidget {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF2E7D32),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                      borderRadius: BorderRadius.circular(8)),
                 ),
-                child: const Text(
-                  'Request',
-                  style: TextStyle(color: Colors.white),
-                ),
+                child: const Text('Request',
+                    style: TextStyle(color: Colors.white)),
               ),
       ),
     );

@@ -5,12 +5,10 @@ class WorkoutPlace {
   final double latitude;
   final double longitude;
   final String type;
-  final double rating;
-  final int openingHour;
-  final int closingHour;
-  final String phone;
-  final String description;
-  final List<String> amenities;
+  final bool? isOpenNow;
+  final String? openingHours;
+  final String? phoneNumber;
+  final String? website;
 
   const WorkoutPlace({
     required this.id,
@@ -19,40 +17,44 @@ class WorkoutPlace {
     required this.latitude,
     required this.longitude,
     required this.type,
-    required this.rating,
-    this.openingHour = 6,
-    this.closingHour = 22,
-    this.phone = '',
-    this.description = '',
-    this.amenities = const [],
+    this.isOpenNow,
+    this.openingHours,
+    this.phoneNumber,
+    this.website,
   });
 
-  bool isOpenAt(int hour) {
-    if (closingHour > openingHour) {
-      return hour >= openingHour && hour < closingHour;
-    }
-    return hour >= openingHour || hour < closingHour;
-  }
-
   String get availableHours {
-    String fmt(int h) => '${h.toString().padLeft(2, '0')}:00';
-    if (closingHour > openingHour) {
-      return '${fmt(openingHour)} – ${fmt(closingHour)}';
-    }
-    return '${fmt(openingHour)} – ${fmt(closingHour)} (+1)';
+    if (openingHours != null && openingHours!.isNotEmpty) return openingHours!;
+    if (isOpenNow == true) return 'Open now';
+    if (isOpenNow == false) return 'Closed now';
+    return 'Hours not listed';
   }
 }
 
 class WorkoutPlaceResult {
   final List<WorkoutPlace> open;
   final List<WorkoutPlace> closed;
+  final List<WorkoutPlace> unknownHours;
   final double userLat;
   final double userLng;
 
   const WorkoutPlaceResult({
     required this.open,
     required this.closed,
+    required this.unknownHours,
     required this.userLat,
     required this.userLng,
   });
+}
+
+class LocationPermissionDeniedException implements Exception {
+  final bool isPermanent;
+  const LocationPermissionDeniedException({this.isPermanent = false});
+}
+
+class PlacesApiException implements Exception {
+  final String message;
+  const PlacesApiException(this.message);
+  @override
+  String toString() => 'PlacesApiException: $message';
 }

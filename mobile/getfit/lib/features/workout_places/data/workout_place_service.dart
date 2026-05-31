@@ -1,238 +1,229 @@
-import '../../../core/data/country_city_data.dart';
+import 'dart:convert';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart' show MissingPluginException;
+import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import '../domain/workout_place.dart';
 
 class WorkoutPlaceService {
-  Future<WorkoutPlaceResult> getWorkoutPlacesWithinDistanceFromLocation({
-    required String city,
-  }) async {
-    await Future.delayed(const Duration(milliseconds: 900));
+  static const String _overpassUrl =
+      'https://overpass-api.de/api/interpreter';
+  static const int _radiusMeters = 3000;
 
-    final userLat = CountryCityData.latitudeFor(city);
-    final userLng = CountryCityData.longitudeFor(city);
-
-    final allPlaces = _placesFor(city);
-    final now = DateTime.now().hour;
+  Future<WorkoutPlaceResult> getWorkoutPlacesWithinDistanceFromLocation() async {
+    final (lat, lng) = await _getCurrentLocation();
+    final places = await _fetchNearbyWorkoutPlaces(lat, lng);
 
     return WorkoutPlaceResult(
-      open: allPlaces.where((p) => p.isOpenAt(now)).toList(),
-      closed: allPlaces.where((p) => !p.isOpenAt(now)).toList(),
-      userLat: userLat,
-      userLng: userLng,
+      open: places.where((p) => p.isOpenNow == true).toList(),
+      closed: places.where((p) => p.isOpenNow == false).toList(),
+      unknownHours: places.where((p) => p.isOpenNow == null).toList(),
+      userLat: lat,
+      userLng: lng,
     );
   }
 
-  static List<WorkoutPlace> _placesFor(String city) {
-    final c = city.toLowerCase();
+  Future<WorkoutPlace> fetchPlaceDetails(WorkoutPlace place) async => place;
 
-    if (['athens', 'thessaloniki', 'patras', 'heraklion', 'larissa'].contains(c)) {
-      return _athensPlaces;
+  Future<(double, double)> _getCurrentLocation() async {
+    try {
+      if (!kIsWeb) {
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) throw LocationServiceDisabledException();
+      }
+
+      var permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.deniedForever) {
+        throw const LocationPermissionDeniedException(isPermanent: true);
+      }
+      if (permission == LocationPermission.denied) {
+        throw const LocationPermissionDeniedException(isPermanent: false);
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+          timeLimit: Duration(seconds: 15),
+        ),
+      );
+      return (pos.latitude, pos.longitude);
+
+    } on LocationServiceDisabledException {
+      rethrow;
+    } on LocationPermissionDeniedException {
+      rethrow;
+    } on MissingPluginException {
+      throw const PlacesApiException(
+        'GPS is not available in the browser.\n'
+        'Please open GetFit on an Android or iOS device.',
+      );
     }
-    if (['nicosia', 'limassol', 'larnaca', 'paphos'].contains(c)) {
-      return _cyprusPlaces;
-    }
-    if (['london', 'manchester', 'birmingham', 'edinburgh', 'glasgow'].contains(c)) {
-      return _londonPlaces;
-    }
-    if (['berlin', 'munich', 'hamburg', 'frankfurt', 'cologne'].contains(c)) {
-      return _berlinPlaces;
-    }
-    if (['paris', 'lyon', 'marseille', 'toulouse', 'nice'].contains(c)) {
-      return _parisPlaces;
-    }
-    return _genericPlaces;
   }
 
-  static const _athensPlaces = [
-    WorkoutPlace(
-      id: 'ath1',
-      name: 'Iron Gym Athens',
-      address: 'Patision 120, Athens',
-      latitude: 37.9900, longitude: 23.7300,
-      type: 'Gym', rating: 4.6,
-      openingHour: 6, closingHour: 23,
-      phone: '+30 210 555 0101',
-      description: 'Full-equipped commercial gym with free weights, machines, cardio equipment and personal training services.',
-      amenities: ['Free Weights', 'Machines', 'Cardio Zone', 'Showers', 'Lockers', 'Personal Training'],
-    ),
-    WorkoutPlace(
-      id: 'ath2',
-      name: 'CityFit Studio',
-      address: 'Panepistimiou 55, Athens',
-      latitude: 37.9830, longitude: 23.7330,
-      type: 'Fitness Studio', rating: 4.4,
-      openingHour: 7, closingHour: 21,
-      phone: '+30 210 555 0202',
-      description: 'Boutique fitness studio offering group classes including HIIT, yoga, pilates and spin cycling.',
-      amenities: ['Group Classes', 'Yoga', 'HIIT', 'Spinning', 'Showers'],
-    ),
-    WorkoutPlace(
-      id: 'ath3',
-      name: 'Olympus CrossFit',
-      address: 'Kallidromiou 18, Athens',
-      latitude: 37.9870, longitude: 23.7280,
-      type: 'CrossFit Box', rating: 4.8,
-      openingHour: 6, closingHour: 22,
-      phone: '+30 210 555 0303',
-      description: 'Certified CrossFit affiliate with experienced coaches, daily WODs and open gym sessions.',
-      amenities: ['CrossFit', 'Olympic Lifting', 'Open Gym', 'Coaching', 'Showers'],
-    ),
-    WorkoutPlace(
-      id: 'ath4',
-      name: 'Acropolis Running Track',
-      address: 'Filopappou Hill, Athens',
-      latitude: 37.9680, longitude: 23.7220,
-      type: 'Outdoor Track', rating: 4.9,
-      openingHour: 6, closingHour: 20,
-      phone: '',
-      description: 'Free outdoor running track with stunning views of the Acropolis. Popular with morning and evening runners.',
-      amenities: ['Running Track', 'Outdoor', 'Free Access', 'Scenic Views'],
-    ),
-    WorkoutPlace(
-      id: 'ath5',
-      name: 'Late Night Fitness 24',
-      address: 'Vouliagmenis 200, Athens',
-      latitude: 37.9750, longitude: 23.7400,
-      type: 'Gym', rating: 4.2,
-      openingHour: 16, closingHour: 2,
-      phone: '+30 210 555 0505',
-      description: 'Night-owl friendly gym open late. Full free weights area, cardio and functional training zone.',
-      amenities: ['Free Weights', 'Cardio Zone', 'Functional Training', 'Lockers'],
-    ),
-  ];
+  Future<List<WorkoutPlace>> _fetchNearbyWorkoutPlaces(
+    double lat,
+    double lng,
+  ) async {
+    final query = '''
+[out:json][timeout:30];
+(
+  node["leisure"="fitness_centre"](around:$_radiusMeters,$lat,$lng);
+  way["leisure"="fitness_centre"](around:$_radiusMeters,$lat,$lng);
+  node["leisure"="sports_centre"](around:$_radiusMeters,$lat,$lng);
+  way["leisure"="sports_centre"](around:$_radiusMeters,$lat,$lng);
+  node["sport"="crossfit"](around:$_radiusMeters,$lat,$lng);
+  way["sport"="crossfit"](around:$_radiusMeters,$lat,$lng);
+  node["sport"="fitness"](around:$_radiusMeters,$lat,$lng);
+  way["sport"="fitness"](around:$_radiusMeters,$lat,$lng);
+);
+out center tags;
+''';
 
-  static const _cyprusPlaces = [
-    WorkoutPlace(
-      id: 'cy1',
-      name: 'Aphrodite Fitness Club',
-      address: 'Makariou Ave 45, Limassol',
-      latitude: 34.6841, longitude: 33.0464,
-      type: 'Gym', rating: 4.5,
-      openingHour: 6, closingHour: 23,
-      phone: '+357 25 555 001',
-      description: 'Premium fitness club with state-of-the-art equipment, swimming pool and spa facilities.',
-      amenities: ['Free Weights', 'Pool', 'Spa', 'Cardio Zone', 'Personal Training', 'Showers'],
-    ),
-    WorkoutPlace(
-      id: 'cy2',
-      name: 'Nicosia Urban Gym',
-      address: 'Ledra St 88, Nicosia',
-      latitude: 35.1856, longitude: 33.3823,
-      type: 'Gym', rating: 4.3,
-      openingHour: 7, closingHour: 22,
-      phone: '+357 22 555 002',
-      description: 'Central city gym catering to all fitness levels with strength, cardio and group class areas.',
-      amenities: ['Free Weights', 'Machines', 'Group Classes', 'Showers', 'Lockers'],
-    ),
-  ];
+    final uri = Uri.parse(_overpassUrl)
+        .replace(queryParameters: {'data': query});
 
-  static const _londonPlaces = [
-    WorkoutPlace(
-      id: 'lon1',
-      name: 'PureGym London Central',
-      address: 'Oxford St 200, London',
-      latitude: 51.5145, longitude: -0.1442,
-      type: 'Gym', rating: 4.3,
-      openingHour: 5, closingHour: 23,
-      phone: '+44 20 7946 0001',
-      description: '24-hour accessible gym with extensive equipment, no contracts required. Great for all levels.',
-      amenities: ['Free Weights', 'Machines', 'Cardio Zone', 'Classes', 'Showers'],
-    ),
-    WorkoutPlace(
-      id: 'lon2',
-      name: 'Battersea Park Athletics Track',
-      address: 'Battersea Park, London',
-      latitude: 51.4815, longitude: -0.1564,
-      type: 'Outdoor Track', rating: 4.7,
-      openingHour: 7, closingHour: 20,
-      phone: '+44 20 7946 0002',
-      description: 'Outdoor athletics track within Battersea Park, open to the public for running and training.',
-      amenities: ['Running Track', 'Outdoor', 'Free Access', 'Park Views'],
-    ),
-  ];
+    final response = await http.get(
+      uri,
+      headers: {
+        'Accept': 'application/json',
+        'User-Agent': 'GetFitApp/1.0 (Flutter)',
+      },
+    ).timeout(const Duration(seconds: 35));
 
-  static const _berlinPlaces = [
-    WorkoutPlace(
-      id: 'ber1',
-      name: 'McFit Berlin Mitte',
-      address: 'Alexanderplatz 5, Berlin',
-      latitude: 52.5219, longitude: 13.4132,
-      type: 'Gym', rating: 4.1,
-      openingHour: 24, closingHour: 24,
-      phone: '+49 30 555 0001',
-      description: 'Budget-friendly 24-hour gym with all essential equipment. No frills, just results.',
-      amenities: ['Free Weights', 'Machines', 'Cardio Zone', 'Showers', '24h Access'],
-    ),
-    WorkoutPlace(
-      id: 'ber2',
-      name: 'Tempelhof Outdoor Track',
-      address: 'Tempelhofer Feld, Berlin',
-      latitude: 52.4733, longitude: 13.4016,
-      type: 'Outdoor Track', rating: 4.9,
-      openingHour: 6, closingHour: 20,
-      phone: '',
-      description: 'Massive outdoor space at the former Tempelhof airport — perfect for running, cycling and calisthenics.',
-      amenities: ['Running Track', 'Outdoor', 'Free Access', 'Calisthenics', 'Cycling'],
-    ),
-  ];
+    if (response.statusCode != 200) {
+      throw PlacesApiException('HTTP ${response.statusCode}');
+    }
 
-  static const _parisPlaces = [
-    WorkoutPlace(
-      id: 'par1',
-      name: 'KeepCool Paris République',
-      address: 'Bd Voltaire 30, Paris',
-      latitude: 48.8637, longitude: 2.3714,
-      type: 'Gym', rating: 4.2,
-      openingHour: 7, closingHour: 23,
-      phone: '+33 1 55 00 01 01',
-      description: 'Modern chain gym with extensive equipment, virtual coaching and unlimited group classes.',
-      amenities: ['Free Weights', 'Machines', 'Group Classes', 'Sauna', 'Showers'],
-    ),
-    WorkoutPlace(
-      id: 'par2',
-      name: 'CrossFit Paris Nation',
-      address: 'Rue de la Nation 15, Paris',
-      latitude: 48.8484, longitude: 2.3958,
-      type: 'CrossFit Box', rating: 4.7,
-      openingHour: 6, closingHour: 21,
-      phone: '+33 1 55 00 02 02',
-      description: 'Top-rated CrossFit box with experienced bilingual coaches and a warm community atmosphere.',
-      amenities: ['CrossFit', 'Olympic Lifting', 'Open Gym', 'Coaching'],
-    ),
-  ];
+    final body = jsonDecode(response.body) as Map<String, dynamic>;
+    final elements = body['elements'] as List<dynamic>? ?? [];
 
-  static const _genericPlaces = [
-    WorkoutPlace(
-      id: 'gen1',
-      name: 'City Fitness Center',
-      address: 'Main Street 1, City Center',
-      latitude: 37.9838, longitude: 23.7275,
-      type: 'Gym', rating: 4.3,
-      openingHour: 6, closingHour: 22,
-      phone: '+1 555 000 0001',
-      description: 'Well-equipped gym serving the local community with strength, cardio and group fitness options.',
-      amenities: ['Free Weights', 'Machines', 'Cardio Zone', 'Showers'],
-    ),
-    WorkoutPlace(
-      id: 'gen2',
-      name: 'Urban CrossFit',
-      address: 'Industrial Zone 5, City',
-      latitude: 37.9900, longitude: 23.7400,
-      type: 'CrossFit Box', rating: 4.6,
-      openingHour: 7, closingHour: 21,
-      phone: '+1 555 000 0002',
-      description: 'Community-driven CrossFit box with daily programming and all-level coaching.',
-      amenities: ['CrossFit', 'Olympic Lifting', 'Open Gym'],
-    ),
-    WorkoutPlace(
-      id: 'gen3',
-      name: 'Riverside Running Park',
-      address: 'Riverside Promenade, City',
-      latitude: 37.9750, longitude: 23.7100,
-      type: 'Outdoor Track', rating: 4.8,
-      openingHour: 5, closingHour: 21,
-      phone: '',
-      description: 'Scenic riverside outdoor running track and calisthenics park, free and open to all.',
-      amenities: ['Running Track', 'Outdoor', 'Free Access', 'Calisthenics'],
-    ),
-  ];
+    final seen = <String>{};
+    final places = <WorkoutPlace>[];
+
+    for (final el in elements) {
+      final place = _parseElement(el as Map<String, dynamic>);
+      if (place != null && seen.add(place.id)) {
+        places.add(place);
+      }
+    }
+
+    places.sort((a, b) {
+      int rank(bool? v) => v == true ? 0 : v == null ? 1 : 2;
+      return rank(a.isOpenNow).compareTo(rank(b.isOpenNow));
+    });
+
+    return places;
+  }
+
+  WorkoutPlace? _parseElement(Map<String, dynamic> el) {
+    final tags = (el['tags'] as Map<String, dynamic>?) ?? {};
+    final name = (tags['name'] as String? ?? '').trim();
+    if (name.isEmpty) return null;
+
+    double? lat, lng;
+    if (el['type'] == 'node') {
+      lat = (el['lat'] as num?)?.toDouble();
+      lng = (el['lon'] as num?)?.toDouble();
+    } else {
+      final center = el['center'] as Map<String, dynamic>?;
+      lat = (center?['lat'] as num?)?.toDouble();
+      lng = (center?['lon'] as num?)?.toDouble();
+    }
+    if (lat == null || lng == null) return null;
+
+    final openingHoursStr = tags['opening_hours'] as String?;
+
+    final houseNo = tags['addr:housenumber'] as String?;
+    final street  = tags['addr:street']      as String?;
+    final city    = tags['addr:city']        as String?;
+    final address = [
+      if (street != null) '${houseNo != null ? '$houseNo ' : ''}$street',
+      ?city,
+    ].join(', ');
+
+    return WorkoutPlace(
+      id: '${el['type']}_${el['id']}',
+      name: name,
+      address: address,
+      latitude: lat,
+      longitude: lng,
+      type: _inferType(tags),
+      isOpenNow: _isCurrentlyOpen(openingHoursStr),
+      openingHours: openingHoursStr,
+      phoneNumber: (tags['phone']          as String?) ??
+                   (tags['contact:phone']  as String?),
+      website:     (tags['website']         as String?) ??
+                   (tags['contact:website'] as String?),
+    );
+  }
+
+  String _inferType(Map<String, dynamic> tags) {
+    final sport   = tags['sport']   as String? ?? '';
+    final leisure = tags['leisure'] as String? ?? '';
+    if (sport.contains('crossfit'))  return 'CrossFit Box';
+    if (leisure == 'sports_centre')  return 'Sports Centre';
+    if (leisure == 'fitness_centre') return 'Gym';
+    if (sport.contains('fitness'))   return 'Fitness Centre';
+    return 'Fitness Facility';
+  }
+
+  bool? _isCurrentlyOpen(String? hoursStr) {
+    if (hoursStr == null || hoursStr.trim().isEmpty) return null;
+
+    final s = hoursStr.trim().toLowerCase();
+    if (s == '24/7')   return true;
+    if (s == 'closed') return false;
+
+    final now      = DateTime.now();
+    final todayIdx = now.weekday - 1;
+    final nowMin   = now.hour * 60 + now.minute;
+
+    for (final rule in s.split(';')) {
+      final r = rule.trim();
+      if (r.isEmpty) continue;
+
+      final timeRx = RegExp(r'(\d{1,2}:\d{2})-(\d{1,2}:\d{2})');
+      final tm = timeRx.firstMatch(r);
+      if (tm == null) continue;
+
+      final openMin  = _toMinutes(tm.group(1)!);
+      var   closeMin = _toMinutes(tm.group(2)!);
+      if (closeMin == 0) closeMin = 24 * 60;
+
+      final dayPart = r.substring(0, tm.start).trim();
+      if (_dayApplies(dayPart, todayIdx)) {
+        return nowMin >= openMin && nowMin < closeMin;
+      }
+    }
+    return null;
+  }
+
+  bool _dayApplies(String dayPart, int todayIdx) {
+    if (dayPart.isEmpty) return true;
+    const abbr = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
+
+    final rangeRx = RegExp(r'^([a-z]{2})-([a-z]{2})$');
+    final rm = rangeRx.firstMatch(dayPart);
+    if (rm != null) {
+      final from = abbr.indexOf(rm.group(1)!);
+      final to   = abbr.indexOf(rm.group(2)!);
+      if (from != -1 && to != -1) {
+        if (from <= to) return todayIdx >= from && todayIdx <= to;
+        return todayIdx >= from || todayIdx <= to;
+      }
+    }
+
+    return dayPart
+        .split(',')
+        .map((d) => d.trim())
+        .any((d) => abbr.indexOf(d) == todayIdx);
+  }
+
+  int _toMinutes(String hhmm) {
+    final parts = hhmm.split(':');
+    return int.parse(parts[0]) * 60 + int.parse(parts[1]);
+  }
 }

@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>GetFit needs your location to find nearby workout places.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>GetFit reads your activity data to track progress.</string>
 	<key>NSCameraUsageDescription</key>
