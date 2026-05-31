@@ -151,10 +151,8 @@ The app ships with a pre-seeded `assets/mock/users.json` file. Use any of the cr
 
 | Role | Email | Password |
 |---|---|---|
-| Regular user | `user@getfit.com` | `password123` |
-| Regular user (premium) | `premium@getfit.com` | `password123` |
-| Coach | `coach@getfit.com` | `password123` |
-
+| User | `user1@getfit.com` | `123456` |
+| Coach | `coach1@getfit.com` | `123456` |
 > You can also tap **"Create a new account"** on the login screen and go through the full 6-step onboarding flow to register a custom profile.
 
 ---
