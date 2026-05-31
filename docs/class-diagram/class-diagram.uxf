@@ -1,0 +1,329 @@
+<diagram program="umletino" version="15.1"><zoom_level>6</zoom_level><element><id>UMLClass</id><coordinates><x>600</x><y>462</y><w>132</w><h>102</h></coordinates><panel_attributes>AppUser
+--
++ id: String
++ username: String
++ email: String
++ password: String
++ role: String
++ premiumEnabled: bool
++ selectedCoachId: String?
++ profile: FitnessProfile
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>930</x><y>498</y><w>126</w><h>156</h></coordinates><panel_attributes>WorkoutPlace
+--
++ id: String
++ name: String
++ address: String
++ latitude: double
++ longitude: double
++ type: String
++ double rating: double
++ openingHour: int
++ closingHour: int
++ phone: String
++ description: String
++ amenities: List&lt;String&gt;
+--
++ availableHours()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>930</x><y>690</y><w>126</w><h>66</h></coordinates><panel_attributes>Location
+--
+- _latitude: double?
+- _longitude: double?
+--
++ setCoordinates()
++ getCoordinates()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>756</x><y>564</y><w>126</w><h>42</h></coordinates><panel_attributes>MealIngredient
+--
++ name: String
++ amount: double
++ unit: String</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>594</x><y>606</y><w>126</w><h>192</h></coordinates><panel_attributes>FitnessProflie
+--
++ name: String
++ age: int
++ sex: String
++ heightCm: double
++ weightKg: double
++ goal: String
++ activityLevel: String
++ bmi: double
++ tdee: double
++ bodyFatPercent; double?
++ workoutPreferences: String
++ targetRateOfChange: double
++ country: String
++ city: String
+--
++ targetDailyCalories()
++ fromJson()
++ toJson()
++ copyWith()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>642</x><y>558</y><w>30</w><h>60</h></coordinates><panel_attributes>1..1
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;80</additional_attributes></element><element><id>UMLClass</id><coordinates><x>78</x><y>696</y><w>126</w><h>90</h></coordinates><panel_attributes>ActivityGoal
+--
++ targetSteps: int
++ targetActiveMinutes: int
++ targetCaloriesBurned: double
++ targetWorkouts: int
++ createdAt: DateTime
++ isSystemSuggested: bool
+--
++ copyWith()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>114</x><y>384</y><w>126</w><h>96</h></coordinates><panel_attributes>DailyProgress
+--
++ steps: int
++ activeMinutes: int
++ caloriesBurned: double
++ heartRateAvg: double
++ distanceKm: double?
++ fetchedAt: DateTime
++ isMockData: bool
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>408</x><y>360</y><w>126</w><h>66</h></coordinates><panel_attributes>ProgressEntry
+--
++ id: String
++ date: DateTime
++ weightKg: double
++ bodyFatPercent: double?
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>432</x><y>624</y><w>126</w><h>138</h></coordinates><panel_attributes>AssignedPlan
+--
++ id: String
++ clientId: String
++ clientName: String
++ title: String
++ description: String
++ weeklyWorkouts: int
++ cardioDays: int
++ durationWeeks: int
++ nutritionNotes: String
++ createdAt: DateTime
++ isUpdated: bool
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>930</x><y>408</y><w>126</w><h>48</h></coordinates><panel_attributes>MealRecommendationService
+--
+
+--
++ getMealsWithConstraints()
++ _goalMeals()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>774</x><y>690</y><w>126</w><h>72</h></coordinates><panel_attributes>PlanRequest
+--
++ clientId: String
++ clientName: String
++ coachId: String
++ requestedAt: String
+--</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>264</x><y>516</y><w>126</w><h>96</h></coordinates><panel_attributes>FoodLogEntry
+--
++ id: String
++ date: DateTime
++ product: FoodProduct
++ quantityG: double
+--
++ calories()
++ protein()
++ carbs()
++ fat()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>264</x><y>330</y><w>120</w><h>114</h></coordinates><panel_attributes>FoodLogController
+--
+-  _entries: List&lt;FoodLogEntry&gt;
+--
++ entries()
++ todaysEntries()
++ todayCalories()
++ todayProtein()
++ todayCarbs()
++ todayFat()
++ logFood()
++ removeEntry()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>318</x><y>606</y><w>30</w><h>48</h></coordinates><panel_attributes>1..1
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;60</additional_attributes></element><element><id>UMLClass</id><coordinates><x>270</x><y>642</y><w>120</w><h>156</h></coordinates><panel_attributes>FoodProduct
+--
++ barcode; String
++ name: String
++ brand: String
++ caloriesPer100g: double
++ proteinPer100g: double
++ carbsPer100g: double
++ fatsPer100g: double
++ fiberPer100g: double
++ sugarPer100g: double
++ servingUnit: String
++ typicalServingG: double
+--
++ caloriesFor()
++ proteinFor()
++ carbsFor()
++ fatFor()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>312</x><y>438</y><w>30</w><h>90</h></coordinates><panel_attributes>0..*
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;130</additional_attributes></element><element><id>UMLClass</id><coordinates><x>438</x><y>474</y><w>126</w><h>108</h></coordinates><panel_attributes>CoachPlanController
+--
+- _plans: List&lt;AssignedPlan&gt;
+- _requests: List&lt;PlanRequest&gt;
+--
++ requests()
++ plansForClient()
++ latestPlanForClient()
++ pendingRequestsForCoach()
++ requestPlan()
++ dismissRequest()
++ createOrUpdatePlan()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>486</x><y>576</y><w>30</w><h>60</h></coordinates><panel_attributes>1..1
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;80</additional_attributes></element><element><id>UMLClass</id><coordinates><x>96</x><y>90</y><w>126</w><h>216</h></coordinates><panel_attributes>GoogleFitConnector
+--
+- _status: FitConnectionStatus
+- _snapshot: DailyProgress?
+- _weeklyGoal: ActivityGoal?
+- _suggestedGoal: ActivityGoal?
+- _errorMessage: String? 
+
+--
+
++ status()
++ snapshot()
++ get weeklyGoal()
++ suggestedGoal()
++ errorMessage()
++ isConnected()
++ requestConnection()
+- _retrieveActivityData()
+- _loadDemoData()
++ refresh()
++ requestActivityPlan()
++ saveActivityPlan()
++ clearGoal()
+- _numericValue()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>114</x><y>528</y><w>126</w><h>90</h></coordinates><panel_attributes>&lt;&lt;enumeration&gt;&gt;
+FitConnectionStatus
+--
+disconnected
+connecting
+connected
+permissionDenied
+error
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>78</x><y>300</y><w>96</w><h>408</h></coordinates><panel_attributes>0..2
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>140;10;140;100;10;100;10;660</additional_attributes></element><element><id>Relation</id><coordinates><x>126</x><y>300</y><w>30</w><h>96</h></coordinates><panel_attributes>0..1
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;140</additional_attributes></element><element><id>UMLClass</id><coordinates><x>756</x><y>402</y><w>126</w><h>120</h></coordinates><panel_attributes>MealRecommendation
+--
++ id: String
++ title: String
++ category: String
++ calories: int
++ proteinGrams: int
++ carbsGrams: int
++ fatsGrams: int
++ description: String
++ imageEmoji: String
++ ingredients: List&lt;MealIngredient&gt;
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>816</x><y>516</y><w>30</w><h>60</h></coordinates><panel_attributes>0..*
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;80</additional_attributes></element><element><id>UMLClass</id><coordinates><x>756</x><y>294</y><w>126</w><h>72</h></coordinates><panel_attributes>MyMeal
+--
++ id: String
++ meal: MealRecommendation
++ savedAt: DateTime
+
+--
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>810</x><y>360</y><w>30</w><h>54</h></coordinates><panel_attributes>1..1
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;70</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1080</x><y>252</y><w>126</w><h>84</h></coordinates><panel_attributes>ShoppingListItem
+--
++ id: String
++ name: String
++ amount: double
++ unit: String
++ isChecked: bool
+
+--
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>744</x><y>168</y><w>126</w><h>84</h></coordinates><panel_attributes>MyMealController
+--
+- _meals: List&lt;MyMeal&gt;
+
+--
++ meals()
++ isSaved()
++ addMeal()
++ removeMeal()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>792</x><y>246</y><w>30</w><h>60</h></coordinates><panel_attributes>0..*
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;80</additional_attributes></element><element><id>UMLClass</id><coordinates><x>894</x><y>156</y><w>126</w><h>108</h></coordinates><panel_attributes>ShoppingListController
+--
+- _items: List&lt;ShoppingListItem&gt;
+
+--
++ items()
++ isEmpty()
++ addIngredients()
++ toggleItem()
++ removeItem()
++ clearChecked()
++ clearAll()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>948</x><y>222</y><w>204</w><h>78</h></coordinates><panel_attributes>0..*
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;70;10;110;150;110;150;10;320;10;320;50</additional_attributes></element><element><id>UMLClass</id><coordinates><x>408</x><y>228</y><w>126</w><h>66</h></coordinates><panel_attributes>ProgressController
+--
++ _entries: List&lt;ProgressEntry&gt;
+
+--
++ entries()
++ measurementHistory()
++ initialWeight()
++ weightChange()
++ currentBodyFat()
++ trackingStreak()
++ dailyTrend()
++ weeklyTrend()
++ saveMeasurement()
++ removeEntry()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>462</x><y>288</y><w>30</w><h>84</h></coordinates><panel_attributes>0..*
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;120</additional_attributes></element><element><id>UMLClass</id><coordinates><x>264</x><y>186</y><w>126</w><h>114</h></coordinates><panel_attributes>StoreMealItem
+--
++ id: String
++ name: String
++ category: String
++ emoji: String
++ calories: int
++ proteinGrams: double
++ carbsGrams: double
++ fatsGrams: double
++ servingGrams: double
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>264</x><y>54</y><w>126</w><h>78</h></coordinates><panel_attributes>Store
+--
++ id: String
++ name: String
++ emoji: String
++ type: String
++ menu: List&lt;StoreMealItem&gt;
+--
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>318</x><y>126</y><w>30</w><h>72</h></coordinates><panel_attributes>0..*
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element><element><id>UMLClass</id><coordinates><x>552</x><y>306</y><w>186</w><h>132</h></coordinates><panel_attributes>WorkoutPlaceService
+--
+- _overpassUrl: String
+- _radiusMeters: int
+--
++ getWorkoutPlacesWithinDistanceFromLocation()
++ fetchPlaceDetails()
+- _getCurrentLocation()
+- _fetchNearbyWorkoutPlaces()
+- _parseElement()
+- _inferType()
+- _isCurrentlyOpen()
+- _dayApplies()
+- _toMinutes()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>936</x><y>300</y><w>126</w><h>66</h></coordinates><panel_attributes>WorkoutCatalog
+--
++ categories: List&lt;String&gt;
++ strengthExercises: List&lt;String&gt;
++ cardioExercises: List&lt;String&gt;
+--
++ byCategory()</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1086</x><y>618</y><w>126</w><h>126</h></coordinates><panel_attributes>WorkoutEntry
+--
++ id: String
++ category: String
++ exercise: String
++ sets: int?
++ reps: int?
++ weightKg: double
++ durationMinutes: int?
++ intensity: String?
++ notes: String?
++ estimatedCalories: double
+--
+
+</panel_attributes><additional_attributes></additional_attributes></element><element><id>UMLClass</id><coordinates><x>1086</x><y>516</y><w>126</w><h>48</h></coordinates><panel_attributes>WorkoutSession
+--
++ id: String
++ createdAt: DateTime
++ entries: List&lt;WorkoutEntry&gt;</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1140</x><y>558</y><w>30</w><h>72</h></coordinates><panel_attributes>0..*
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;100</additional_attributes></element><element><id>UMLClass</id><coordinates><x>1086</x><y>354</y><w>126</w><h>102</h></coordinates><panel_attributes>WorkoutController
+--
+- _sessions: List&lt;WorkoutSession&gt;
+--
++ sessions()
++ totalSessions()
++ totalActivities()
++ totalCaloriesBurned()
++ latestSession()
++ addSession()
++ clearSessions()</panel_attributes><additional_attributes></additional_attributes></element><element><id>Relation</id><coordinates><x>1134</x><y>450</y><w>30</w><h>78</h></coordinates><panel_attributes>0..*
+lt=&lt;&lt;&lt;&lt;-</panel_attributes><additional_attributes>10;10;10;110</additional_attributes></element></diagram>
